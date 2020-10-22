@@ -1,8 +1,8 @@
-﻿namespace Mospolyhelper.Domain.Schedule.Models
+﻿namespace Mospolyhelper.Domain.Schedule.Model
 {
     public class Group
     {
-        public static Group Empty = new Group(string.Empty, false);
+        public static Group Empty { get; } = new Group(string.Empty, false);
 
 
         public string Title { get; }

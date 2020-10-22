@@ -1,44 +1,66 @@
 ﻿using System;
 using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
+using System.Web;
+using Mospolyhelper.Utils;
 
 namespace Mospolyhelper.Data.Schedule.Api
 {
-    class ScheduleClient
+    public class ScheduleClient
     {
         private const string UrlBase = "https://rasp.dmami.ru";
         private const string UrlGetSchedule = UrlBase + "/site/group";
-        private readonly string UrlGetAllSchedules = UrlBase + Environment.GetEnvironmentVariable("URL_SCHEDULE_ALL");
+        private readonly string UrlGetAllSchedules = 
+            UrlBase + Secrets.URL_SCHEDULE_ALL;
+        private readonly string UrlGetAllSchedulesSession = 
+            UrlBase + Secrets.URL_SCHEDULE_SESSION_ALL;
 
-        public Task<string> GetSchedule(string groupTitle, bool isSession)
+        private readonly HttpClient client;
+
+        public ScheduleClient(HttpClient client)
         {
-            using var client = new WebClient
-            {
-                Headers = 
-                {
-                    [HttpRequestHeader.Referer] = UrlBase, 
-                    ["X-Requested-With"] = "XMLHttpRequest"
-                },
-                QueryString = 
-                {
-                    ["group"] = groupTitle, 
-                    ["session"] = isSession ? "1" : "0"
-                }
-            };
-            return client.DownloadStringTaskAsync(UrlGetSchedule);
+            this.client = client;
         }
 
-        public Task<string> GetAllSchedules()
+        public async Task<string> GetSchedule(string groupTitle, bool isSession)
         {
-            using var client = new WebClient
+            var builder = new UriBuilder(UrlGetSchedule);
+            var query = HttpUtility.ParseQueryString(builder.Query);
+            query["group"] = groupTitle;
+            query["session"] = isSession ? "1" : "0";
+            builder.Query = query.ToString();
+            var url = builder.Uri;
+            var request = new HttpRequestMessage
             {
+                RequestUri = url,
+                Method = HttpMethod.Get,
                 Headers =
                 {
-                    [HttpRequestHeader.Referer] = UrlBase,
-                    ["X-Requested-With"] = "XMLHttpRequest"
+                    { nameof(HttpRequestHeader.Referer), UrlBase },
+                    { "X-Requested-With", "XMLHttpRequest" }
                 }
             };
-            return client.DownloadStringTaskAsync(UrlGetAllSchedules);
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        public async Task<string> GetAllSchedules(bool isSession)
+        {
+            var request = new HttpRequestMessage
+            {
+                RequestUri = new Uri(isSession ? UrlGetAllSchedulesSession : UrlGetAllSchedules),
+                Method = HttpMethod.Get,
+                Headers =
+                {
+                    { nameof(HttpRequestHeader.Referer), UrlBase },
+                    { "X-Requested-With", "XMLHttpRequest" }
+                }
+            };
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
         }
     }
 }

@@ -6,7 +6,7 @@ using Mospolyhelper.Data.Schedule.Converters;
 
 namespace Mospolyhelper.Data.Schedule.Remote
 {
-    class ScheduleRemoteDataSource
+    public class ScheduleRemoteDataSource
     {
         private readonly ScheduleClient client;
         private readonly ScheduleRemoteConverter converter;
@@ -17,7 +17,7 @@ namespace Mospolyhelper.Data.Schedule.Remote
             this.converter = converter;
         }
 
-        public async Task<Domain.Schedule.Models.Schedule?> Get(string groupTitle, bool isSession)
+        public async Task<Domain.Schedule.Model.Schedule?> Get(string groupTitle, bool isSession)
         {
             try
             {
@@ -31,17 +31,17 @@ namespace Mospolyhelper.Data.Schedule.Remote
             }
         }
 
-        public async Task<IList<Domain.Schedule.Models.Schedule>> GetAll()
+        public async Task<IList<Domain.Schedule.Model.Schedule>> GetAll(bool isSession)
         {
             try
             {
-                var scheduleString = await client.GetAllSchedules();
+                var scheduleString = await client.GetAllSchedules(isSession);
                 return converter.ParseSchedules(scheduleString);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return Array.Empty<Domain.Schedule.Models.Schedule>();
+                return Array.Empty<Domain.Schedule.Model.Schedule>();
             }
         }
     }

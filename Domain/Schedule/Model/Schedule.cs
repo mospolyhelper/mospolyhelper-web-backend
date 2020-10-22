@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Mospolyhelper.Domain.Schedule.Models
+namespace Mospolyhelper.Domain.Schedule.Model
 {
     public class Schedule
     {
@@ -123,11 +123,11 @@ namespace Mospolyhelper.Domain.Schedule.Models
 
         public static Schedule Filter(
             this IEnumerable<Schedule> schedules,
-            ISet<string>? titles = null,
-            ISet<string>? types = null,
-            ISet<string>? auditoriums = null,
-            ISet<string>? teachers = null,
-            ISet<string>? groups = null
+            IEnumerable<string>? titles = null,
+            IEnumerable<string>? types = null,
+            IEnumerable<string>? auditoriums = null,
+            IEnumerable<string>? teachers = null,
+            IEnumerable<string>? groups = null
         )
         {
             var filterTitles = titles == null;
@@ -199,8 +199,8 @@ namespace Mospolyhelper.Domain.Schedule.Models
                     else
                     {
                         var lessonEqualForGroups = dayNew[index];
-                        var newGroups = lesson.Groups.ToList();
-                        newGroups.AddRange(lessonEqualForGroups.Groups);
+                        var newGroups = lessonEqualForGroups.Groups.ToList();
+                        newGroups.AddRange(lesson.Groups);
                         dayNew[index] = new Lesson(
                             lesson.Order,
                             lesson.Title,
@@ -222,19 +222,19 @@ namespace Mospolyhelper.Domain.Schedule.Models
         {
             return l1.Order == l2.Order &&
                    l1.Title == l2.Title &&
-                   l1.Auditoriums.Equals(l2.Auditoriums) &&
-                   l1.Teachers.Equals(l2.Teachers) &&
+                   l1.Auditoriums.SequenceEqual(l2.Auditoriums) &&
+                   l1.Teachers.SequenceEqual(l2.Teachers) &&
                    l1.DateFrom == l2.DateFrom &&
                    l1.DateTo == l2.DateTo;
         }
 
     public static Schedule Filter(
             this Schedule schedule,
-            ISet<string>? titles = null,
-            ISet<string>? types = null,
-            ISet<string>? auditoriums = null,
-            ISet<string>? teachers = null,
-            ISet<string>? groups = null
+            IEnumerable<string>? titles = null,
+            IEnumerable<string>? types = null,
+            IEnumerable<string>? auditoriums = null,
+            IEnumerable<string>? teachers = null,
+            IEnumerable<string>? groups = null
         )
         {
             var filterTitles = titles == null;

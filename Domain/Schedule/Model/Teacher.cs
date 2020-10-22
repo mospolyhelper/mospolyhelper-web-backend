@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace Mospolyhelper.Domain.Schedule.Models
+namespace Mospolyhelper.Domain.Schedule.Model
 {
     public class Teacher
     {
@@ -30,6 +30,36 @@ namespace Mospolyhelper.Domain.Schedule.Models
         public Teacher(IList<string> names)
         {
             this.Names = names;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is Teacher other)
+            {
+                return Equals(other);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        protected bool Equals(Teacher other)
+        {
+            return Names.SequenceEqual(other.Names);
+        }
+
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                var hash = 19;
+                foreach (var name in Names)
+                {
+                    hash = hash * 31 + name.GetHashCode();
+                }
+                return hash;
+            }
         }
     }
 }

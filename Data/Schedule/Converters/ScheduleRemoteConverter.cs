@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
-using Mospolyhelper.Domain.Schedule.Models;
+using Mospolyhelper.Domain.Schedule.Model;
 
 namespace Mospolyhelper.Data.Schedule.Converters
 {
-    class ScheduleRemoteConverter
+    public class ScheduleRemoteConverter
     {
         #region Constants
 
@@ -46,12 +46,12 @@ namespace Mospolyhelper.Data.Schedule.Converters
 
         #endregion
 
-        public IList<Domain.Schedule.Models.Schedule> ParseSchedules(string schedulesString)
+        public IList<Domain.Schedule.Model.Schedule> ParseSchedules(string schedulesString)
         {
             using var json = JsonDocument.Parse(schedulesString);
             var root = json.RootElement;
             var contents = root.GetProperty("contents");
-            var schedules = new List<Domain.Schedule.Models.Schedule>();
+            var schedules = new List<Domain.Schedule.Model.Schedule>();
             foreach (var scheduleJson in contents.EnumerateArray())
             {
                 schedules.Add(ParseSchedule(scheduleJson));
@@ -60,7 +60,7 @@ namespace Mospolyhelper.Data.Schedule.Converters
         }
 
 
-        public Domain.Schedule.Models.Schedule Parse(string scheduleString)
+        public Domain.Schedule.Model.Schedule Parse(string scheduleString)
         {
             using var json = JsonDocument.Parse(scheduleString);
             var root = json.RootElement;
@@ -95,7 +95,7 @@ namespace Mospolyhelper.Data.Schedule.Converters
             return ParseSchedule(root);
         }
 
-        private Domain.Schedule.Models.Schedule ParseSchedule(JsonElement json)
+        private Domain.Schedule.Model.Schedule ParseSchedule(JsonElement json)
         {
             var isByDate = json.GetProperty(IsSession).GetBoolean();
             var group = json.TryGetProperty(GroupKey, out var groupElement) ? ParseGroup(groupElement) : Group.Empty;
@@ -106,7 +106,7 @@ namespace Mospolyhelper.Data.Schedule.Converters
             );
 
 
-            return Domain.Schedule.Models.Schedule.From(dailySchedules);
+            return Domain.Schedule.Model.Schedule.From(dailySchedules);
         }
 
         private Group ParseGroup(JsonElement json)

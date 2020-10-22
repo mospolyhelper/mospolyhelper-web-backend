@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
-namespace Mospolyhelper.Domain.Schedule.Models
+namespace Mospolyhelper.Domain.Schedule.Model
 {
     public class Lesson : IComparable<Lesson>
     {
@@ -85,7 +85,7 @@ namespace Mospolyhelper.Domain.Schedule.Models
                 "Russian Standard Time"
                 );
             var time = new TimeSpan(dateTimeMoscow.Hour, dateTimeMoscow.Minute, dateTimeMoscow.Second);
-            if (time > LessonTimes.thirdPair.Item1)
+            if (time > LessonTimes.thirdPair.Item2)
             {
                 if (time <= LessonTimes.fourthPair.Item2)
                     return new CurrentLesson(3, time >= LessonTimes.fourthPair.Item1, groupIsEvening);
@@ -177,16 +177,24 @@ namespace Mospolyhelper.Domain.Schedule.Models
                 result = 31 * result + Evening.GetHashCode();
                 return result;
             }
+
+            public override string ToString()
+            {
+                return $"Номер занятия: {Order}, занятие {(Started ? "" : "не ")}началось, " +
+                       $"{(Evening ? "вечерняя" : "дневная")} группа";
+            }
         }
 
         public int CompareTo(Lesson other)
         {
             if (Order != other.Order) return Order.CompareTo(other.Order);
             if (GroupIsEvening != other.GroupIsEvening) return GroupIsEvening ? 1 : -1;
+            var g1 = string.Join(' ', Groups);
+            var g2 = string.Join(' ', other.Groups);
+            var groupComparing = g1.CompareTo(g2);
+            if (groupComparing != 0) return groupComparing;
             if (DateFrom != other.DateFrom) return DateFrom.CompareTo(other.DateFrom);
-            if (DateTo != other.DateTo) return DateTo.CompareTo(other.DateTo);
-            return string.Join(' ', Groups)
-                .CompareTo(string.Join(' ', other.Groups));
+            return DateTo.CompareTo(other.DateTo);
         }
 
     }

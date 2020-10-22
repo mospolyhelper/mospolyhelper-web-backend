@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Mospolyhelper.Data.Schedule.Remote;
-using Mospolyhelper.Domain.Schedule.Models;
+using Mospolyhelper.Domain.Schedule.Model;
 
 namespace Mospolyhelper.Data.Schedule.Repository
 {
-    class ScheduleRepository
+    public class ScheduleRepository
     {
         private ScheduleRemoteDataSource remoteDataSource;
 
@@ -14,7 +15,7 @@ namespace Mospolyhelper.Data.Schedule.Repository
             this.remoteDataSource = remoteDataSource;
         }
 
-        public async Task<Domain.Schedule.Models.Schedule?> GetSchedule(string groupTitle)
+        public async Task<Domain.Schedule.Model.Schedule?> GetSchedule(string groupTitle)
         {
             return ScheduleExt.Combine(
                 await remoteDataSource.Get(groupTitle, false),
@@ -22,9 +23,10 @@ namespace Mospolyhelper.Data.Schedule.Repository
                 );
         }
 
-        public async Task<IList<Domain.Schedule.Models.Schedule>> GetAllSchedules()
+        public async Task<IEnumerable<Domain.Schedule.Model.Schedule>> GetAllSchedules()
         {
-            return await remoteDataSource.GetAll();
+            return (await remoteDataSource.GetAll(false))
+                .Union(await remoteDataSource.GetAll(true));
         }
     }
 }
