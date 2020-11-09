@@ -4,6 +4,7 @@ using System.Collections.Immutable;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Mospolyhelper.Data.Schedule.Api;
 using Mospolyhelper.Data.Schedule.Converters;
@@ -26,9 +27,9 @@ namespace Mospolyhelper.Features.Controllers.Schedule
         {
             this.useCase = useCase;
         }
-
+        [EnableCors("MyPolicy")]
         [HttpGet("schedule")]
-        public async Task<IActionResult> Get([FromQuery] string id)
+        public async Task<ActionResult<Domain.Schedule.Model.Schedule?>> Get([FromQuery] string id)
         {
             return Ok(await useCase.GetSchedule(id));
         }
@@ -43,7 +44,7 @@ namespace Mospolyhelper.Features.Controllers.Schedule
         }
 
         [HttpPost("schedule")]
-        public async Task<IActionResult> GetFilteredSchedule([FromBody] ScheduleFilterQuery query)
+        public async Task<ActionResult<Domain.Schedule.Model.Schedule?>> GetFilteredSchedule([FromBody] ScheduleFilterQuery query)
         {
             return Ok(
                 await useCase.GetSchedule(
@@ -58,31 +59,31 @@ namespace Mospolyhelper.Features.Controllers.Schedule
 
 
         [HttpGet("group-list")]
-        public async Task<IActionResult> GetGroupList()
+        public async Task<ActionResult<IEnumerable<string>>> GetGroupList()
         {
             return Ok(await useCase.GetGroupList());
         }
 
         [HttpGet("teacher-list")]
-        public async Task<IActionResult> GetTeacherList()
+        public async Task<ActionResult<IEnumerable<string>>> GetTeacherList()
         {
             return Ok(await useCase.GetTeacherList());
         }
 
         [HttpGet("auditorium-list")]
-        public async Task<IActionResult> GetAuditoriumList()
+        public async Task<ActionResult<IEnumerable<string>>> GetAuditoriumList()
         {
             return Ok(await useCase.GetAuditoriumList());
         }
 
         [HttpGet("title-list")]
-        public async Task<IActionResult> GetTitleList()
+        public async Task<ActionResult<IEnumerable<string>>> GetTitleList()
         {
             return Ok(await useCase.GetTitleList());
         }
 
         [HttpGet("type-list")]
-        public async Task<IActionResult> GetTypeList()
+        public async Task<ActionResult<IEnumerable<string>>> GetTypeList()
         {
             return Ok(await useCase.GetTypeList());
         }

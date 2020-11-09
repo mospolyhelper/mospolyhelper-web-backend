@@ -55,13 +55,6 @@ namespace Mospolyhelper.DI
                 .Register(c => new ScheduleUseCase(c.Resolve<IScheduleRepository>()))
                 .As<ScheduleUseCase>()
                 .SingleInstance();
-
-
-            //// Controllers
-            //builder
-            //    .Register(c => new ScheduleController(c.Resolve<ScheduleUseCase>()))
-            //    .As<ScheduleController>()
-            //    .InstancePerRequest();
         }
     }
 }

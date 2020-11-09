@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Mospolyhelper.Data.Account.Api
 {
@@ -60,10 +61,9 @@ namespace Mospolyhelper.Data.Account.Api
 
         public async Task<string> GetInfo(string sessionId)
         {
-            var url = new Uri(UrlInfo);
             var request = new HttpRequestMessage
             {
-                RequestUri = url,
+                RequestUri = new Uri(UrlInfo),
                 Method = HttpMethod.Get,
                 Headers = { { "Cookie", sessionId } }
             };
@@ -72,13 +72,50 @@ namespace Mospolyhelper.Data.Account.Api
             return await response.Content.ReadAsStringAsync();
         }
 
-        public async Task<string> GetPortfolio()
+        public async Task<string> GetPortfolio(string searchQuery, int page)
         {
-            var url = new Uri(UrlPortfolio);
+            var builder = new UriBuilder(UrlPortfolio);
+            var query = HttpUtility.ParseQueryString(builder.Query);
+            if (searchQuery != string.Empty)
+            {
+                query["objsearch"] = searchQuery;
+            }
+            if (page != 0)
+            {
+                query["pg"] = page.ToString();
+            }
+            builder.Query = query.ToString();
+            var url = builder.Uri;
             var request = new HttpRequestMessage
             {
                 RequestUri = url,
                 Method = HttpMethod.Get
+            };
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        public async Task<string> GetMarks(string sessionId)
+        {
+            var request = new HttpRequestMessage
+            {
+                RequestUri = new Uri(UrlMarks),
+                Method = HttpMethod.Get,
+                Headers = { { "Cookie", sessionId } }
+            };
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        public async Task<string> GetApplications(string sessionId)
+        {
+            var request = new HttpRequestMessage
+            {
+                RequestUri = new Uri(UrlApplications),
+                Method = HttpMethod.Get,
+                Headers = { { "Cookie", sessionId } }
             };
             var response = await client.SendAsync(request);
             response.EnsureSuccessStatusCode();
