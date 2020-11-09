@@ -3,10 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using Mospolyhelper.Data.Schedule.Remote;
 using Mospolyhelper.Domain.Schedule.Model;
+using Mospolyhelper.Domain.Schedule.Repository;
 
 namespace Mospolyhelper.Data.Schedule.Repository
 {
-    public class ScheduleRepository
+    public class ScheduleRepository : IScheduleRepository
     {
         private ScheduleRemoteDataSource remoteDataSource;
 

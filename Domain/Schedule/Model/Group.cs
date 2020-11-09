@@ -1,4 +1,6 @@
-﻿namespace Mospolyhelper.Domain.Schedule.Model
+﻿using System.Text.Json.Serialization;
+
+namespace Mospolyhelper.Domain.Schedule.Model
 {
     public class Group
     {
