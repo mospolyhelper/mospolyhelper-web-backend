@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Web;
 
 namespace Mospolyhelper.Data.Account.Converters
 {
@@ -24,6 +25,12 @@ namespace Mospolyhelper.Data.Account.Converters
 
         private AccountPortfolio ParsePortfolio(IEnumerable<HtmlNode> portfolio)
         {
+            var id = int.Parse(
+                portfolio.FirstOrDefault()?
+                .GetAttributeValue("id", "myModal_-1")
+                .Split('_', StringSplitOptions.RemoveEmptyEntries)
+                .LastOrDefault() ?? "-1"
+                );
             var name = portfolio.FirstOrDefault()?.Descendants("h4")?.FirstOrDefault()?.InnerText ?? string.Empty;
             var body = portfolio.ElementAtOrDefault(1)?.InnerHtml ?? string.Empty;
             var group = new Regex("Группа: <b>(.+?)<\\/b><br")
@@ -38,6 +45,7 @@ namespace Mospolyhelper.Data.Account.Converters
                 .Match(body).Groups[1].Value;
 
             return new AccountPortfolio(
+                id,
                 name,
                 group,
                 direction,
@@ -45,6 +53,56 @@ namespace Mospolyhelper.Data.Account.Converters
                 course,
                 educationForm
                 );
+        }
+
+        public IList<AccountTeacher> ParseTeachers(string teachers)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(teachers);
+            var table = doc.DocumentNode.Descendants("table").LastOrDefault();
+            if (table == null)
+            {
+                return Array.Empty<AccountTeacher>();
+            }
+            var resList = new List<AccountTeacher>();
+            var trs = table.Descendants("tr");
+            foreach (var tr in trs)
+            {
+                var id = int.Parse(
+                    tr.GetAttributeValue("id", "t_-1")
+                    .Split('_', StringSplitOptions.RemoveEmptyEntries)
+                    .LastOrDefault() ?? "-1"
+                    );
+                var tds = tr.Descendants("td").GetEnumerator();
+                tds.MoveNext();
+                var imageUrl = tds.Current.Descendants("img").FirstOrDefault()
+                    ?.GetAttributeValue("src", "img/no_avatar.jpg") ?? "img/no_avatar.jpg";
+                tds.MoveNext();
+                var status = tds.Current.Descendants("img").FirstOrDefault()
+                    ?.GetAttributeValue("title", "offline") ?? "offline";
+                tds.MoveNext();
+                var name = tds.Current.Descendants("b").FirstOrDefault()?.InnerText ?? "Имя не найдено";
+                var info = tds.Current.Descendants("font").FirstOrDefault()?.InnerText ?? string.Empty;
+                tds.MoveNext();
+                var messageKey = tds.Current.Descendants("a").FirstOrDefault()
+                    ?.GetAttributeValue("onclick", string.Empty)
+                    ?.Split("'", StringSplitOptions.RemoveEmptyEntries)
+                    ?.ElementAtOrDefault(1)
+                    ?.Split("&u=", StringSplitOptions.RemoveEmptyEntries)
+                    ?.LastOrDefault() ?? string.Empty;
+                messageKey = HttpUtility.UrlDecode(messageKey);
+                resList.Add(
+                    new AccountTeacher(
+                        id,
+                        name,
+                        info,
+                        imageUrl,
+                        status,
+                        messageKey
+                        )
+                    );
+            }
+            return resList;
         }
 
 
@@ -179,6 +237,213 @@ namespace Mospolyhelper.Data.Account.Converters
             return new AccountMarks(tempListOfList);
         }
 
-        //public IList<Account>
+        public IList<AccountApplication> ParseApplications(string application)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(application);
+            var table = doc.DocumentNode.Descendants("table").LastOrDefault();
+            if (table == null)
+            {
+                return Array.Empty<AccountApplication>();
+            }
+            var resList = new List<AccountApplication>();
+            var trs = table.Descendants("tr").Skip(1);
+            foreach (var tr in trs)
+            {
+                var tds = tr.Descendants("td").GetEnumerator();
+                tds.MoveNext();
+                var dateTime = tds.Current.InnerHtml;
+                tds.MoveNext();
+                var regNumber = tds.Current.InnerHtml;
+                tds.MoveNext();
+                var name = tds.Current.Descendants("a").First().InnerHtml;
+                var info = tds.Current.Descendants("div").First().InnerHtml;
+                tds.MoveNext();
+                var status = tds.Current.InnerHtml;
+                tds.MoveNext();
+                var department = tds.Current.InnerHtml;
+                tds.MoveNext();
+                var note = tds.Current.InnerHtml;
+                resList.Add(
+                    new AccountApplication(
+                        regNumber,
+                        name,
+                        dateTime,
+                        status,
+                        department,
+                        note,
+                        info
+                        )
+                    );
+            }
+            return resList;
+        }
+
+        public IList<AccountClassmate> ParseClassmates(string classmates)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(classmates);
+            var table = doc.DocumentNode.Descendants("table").LastOrDefault();
+            if (table == null)
+            {
+                return Array.Empty<AccountClassmate>();
+            }
+            var resList = new List<AccountClassmate>();
+            var trs = table.Descendants("tr");
+            foreach (var tr in trs)
+            {
+                var id = int.Parse(
+                    tr.GetAttributeValue("id", "t_-1")
+                    .Split('_', StringSplitOptions.RemoveEmptyEntries)
+                    .LastOrDefault() ?? "-1"
+                    );
+                var tds = tr.Descendants("td").GetEnumerator();
+                tds.MoveNext();
+                var imageUrl = tds.Current.Descendants("img").FirstOrDefault()
+                    ?.GetAttributeValue("src", "img/no_avatar.jpg") ?? "img/no_avatar.jpg";
+                tds.MoveNext();
+                var status = tds.Current.Descendants("img").FirstOrDefault()
+                    ?.GetAttributeValue("title", "offline") ?? "offline";
+                tds.MoveNext();
+                var name = tds.Current.InnerText;
+                tds.MoveNext();
+                var messageKey = tds.Current.Descendants("a").FirstOrDefault()
+                    ?.GetAttributeValue("onclick", string.Empty)
+                    ?.Split("'", StringSplitOptions.RemoveEmptyEntries)
+                    ?.ElementAtOrDefault(1)
+                    ?.Split("&u=", StringSplitOptions.RemoveEmptyEntries)
+                    ?.LastOrDefault() ?? string.Empty;
+                messageKey = HttpUtility.UrlDecode(messageKey);
+                resList.Add(
+                    new AccountClassmate(
+                        id,
+                        name,
+                        imageUrl,
+                        status,
+                        messageKey
+                        )
+                    );
+            }
+            return resList;
+        }
+
+        public IList<AccountDialogPreview> ParseDialogs(string messages)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(messages);
+            var table = doc.DocumentNode.Descendants("table").LastOrDefault();
+            if (table == null)
+            {
+                return Array.Empty<AccountDialogPreview>();
+            }
+            var resList = new List<AccountDialogPreview>();
+            var trs = table.Descendants("tr");
+            foreach (var tr in trs)
+            {
+                var id = int.Parse(
+                    tr.GetAttributeValue("id", "t_-1")
+                    .Split('_', StringSplitOptions.RemoveEmptyEntries)
+                    .LastOrDefault() ?? "-1"
+                    );
+                var messageKey = tr.GetAttributeValue("onclick", string.Empty)
+                    ?.Split("'", StringSplitOptions.RemoveEmptyEntries)
+                    ?.ElementAtOrDefault(1)
+                    ?.Split("&dlg=", StringSplitOptions.RemoveEmptyEntries)
+                    ?.LastOrDefault() ?? string.Empty;
+                messageKey = HttpUtility.UrlDecode(messageKey);
+
+                var tds = tr.Descendants("td").GetEnumerator();
+                tds.MoveNext();
+                var imageUrl = tds.Current.Descendants("img").FirstOrDefault()
+                    ?.GetAttributeValue("src", "img/no_avatar.jpg") ?? "img/no_avatar.jpg";
+                tds.MoveNext();
+                var authorName = tds.Current.Descendants("b").FirstOrDefault()
+                    ?.Descendants("b")?.FirstOrDefault()?.InnerText ??
+                    tds.Current.Descendants("b").FirstOrDefault()?.InnerText ?? string.Empty;
+                var authorGroup = tds.Current.Descendants("font").FirstOrDefault()?.InnerText ?? string.Empty;
+                tds.MoveNext();
+                var date = tds.Current.Descendants("font").FirstOrDefault()?.InnerText ?? string.Empty;
+                var message = tds.Current.InnerHtml.Split("<br>").LastOrDefault()?.Trim() ?? string.Empty;
+                tds.MoveNext();
+                var hasAttachments = tds.Current.InnerHtml.Contains("прикреп", StringComparison.InvariantCultureIgnoreCase);
+                tds.MoveNext();
+                var hasRead = tds.Current.InnerHtml.Contains("нов", StringComparison.InvariantCultureIgnoreCase);
+                resList.Add(
+                    new AccountDialogPreview(
+                        id,
+                        messageKey,
+                        authorName,
+                        authorGroup,
+                        imageUrl,
+                        message,
+                        date,
+                        hasAttachments,
+                        hasRead
+                        )
+                    );
+            }
+            return resList;
+        }
+
+        public IList<AccountMessage> ParseDialog(string dialog)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(dialog);
+            var table = doc.DocumentNode.Descendants("table").LastOrDefault();
+            if (table == null)
+            {
+                return Array.Empty<AccountMessage>();
+            }
+            var resList = new List<AccountMessage>();
+            var trs = table.Descendants("tr");
+            foreach (var tr in trs)
+            {
+                var id = int.Parse(
+                    tr.GetAttributeValue("id", "t_-1")
+                    .Split('_', StringSplitOptions.RemoveEmptyEntries)
+                    .LastOrDefault() ?? "-1"
+                    );
+
+                var tds = tr.Descendants("td").GetEnumerator();
+                tds.MoveNext();
+                var imageUrl = tds.Current.Descendants("img").FirstOrDefault()
+                    ?.GetAttributeValue("src", "img/no_avatar.jpg") ?? "img/no_avatar.jpg";
+                tds.MoveNext();
+                var authorNameAndTarget = tds.Current.Descendants("b");
+                var authorName = authorNameAndTarget.FirstOrDefault()?.InnerText ?? string.Empty;
+                var messageTo = authorNameAndTarget.ElementAtOrDefault(1)?.InnerText;
+                var message = tds.Current.Descendants("div").FirstOrDefault()
+                    ?.InnerHtml ?? string.Empty;
+                var index = message.LastIndexOf("<div");
+                if (index != -1 && message.Substring(index).Contains("креп"))
+                {
+                    message = message.Substring(0, index);
+                }
+                var attachmentUrl = tds.Current.Descendants("div").FirstOrDefault()
+                    ?.Descendants("div").FirstOrDefault()
+                    ?.Descendants("a").FirstOrDefault()
+                    ?.GetAttributeValue("href", null)
+                    ?.Split("f=")?.LastOrDefault();
+                attachmentUrl = HttpUtility.UrlDecode(attachmentUrl);
+                tds.MoveNext();
+                var date = tds.Current.Descendants("font").FirstOrDefault()?.InnerText ?? string.Empty;
+                var removeUrl = tds.Current.Descendants("a").FirstOrDefault()
+                    ?.GetAttributeValue("onclick", string.Empty)
+                    .Split("'").Where(it => it.Contains("&dlg=")).FirstOrDefault()
+                    ?.Split("&dlg=")?.LastOrDefault() ?? string.Empty;
+                removeUrl = HttpUtility.UrlDecode(removeUrl);
+                resList.Add(
+                    new AccountMessage(
+                        id,
+                        imageUrl,
+                        authorName,
+                        message,
+                        attachmentUrl,
+                        removeUrl
+                        )
+                    );
+            }
+            return resList;
+        }
     }
 }

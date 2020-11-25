@@ -19,6 +19,19 @@ namespace Mospolyhelper.Data.Account.Remote
             this.converter = converter;
         }
 
+        public async Task<(bool, string?)> GetSessionId(string login, string password, string? sessionId = null)
+        {
+            try
+            {
+                return await client.GetSessionId(login, password, sessionId);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return (false, null);
+            }
+        }
+
         public async Task<IList<AccountPortfolio>> GetPortfolios(string searchQuery, int page)
         {
             try
@@ -30,6 +43,20 @@ namespace Mospolyhelper.Data.Account.Remote
             {
                 Console.WriteLine(e);
                 return Array.Empty<AccountPortfolio>();
+            }
+        }
+
+        public async Task<IList<AccountTeacher>> GetTeachers(string sessionId, string searchQuery, int page)
+        {
+            try
+            {
+                var teachersString = await client.GetTeachers(sessionId, searchQuery, page);
+                return converter.ParseTeachers(teachersString);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Array.Empty<AccountTeacher>();
             }
         }
 
@@ -51,13 +78,69 @@ namespace Mospolyhelper.Data.Account.Remote
         {
             try
             {
-                var infoString = await client.GetMarks(sessionId);
-                return converter.ParseMarks(infoString);
+                var marksString = await client.GetMarks(sessionId);
+                return converter.ParseMarks(marksString);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
                 return null;
+            }
+        }
+
+        public async Task<IList<AccountApplication>> GetApplications(string sessionId)
+        {
+            try
+            {
+                var applicationsString = await client.GetApplications(sessionId);
+                return converter.ParseApplications(applicationsString);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Array.Empty<AccountApplication>();
+            }
+        }
+
+        public async Task<IList<AccountClassmate>> GetClassmates(string sessionId)
+        {
+            try
+            {
+                var classmateString = await client.GetClassmates(sessionId);
+                return converter.ParseClassmates(classmateString);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Array.Empty<AccountClassmate>();
+            }
+        }
+
+        public async Task<IList<AccountDialogPreview>> GetDialogs(string sessionId)
+        {
+            try
+            {
+                var dialogsString = await client.GetDialogs(sessionId);
+                return converter.ParseDialogs(dialogsString);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Array.Empty<AccountDialogPreview>();
+            }
+        }
+
+        public async Task<IList<AccountMessage>> GetDialog(string sessionId, string dialogKey)
+        {
+            try
+            {
+                var dialogString = await client.GetDialog(sessionId, dialogKey);
+                return converter.ParseDialog(dialogString);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Array.Empty<AccountMessage>();
             }
         }
     }

@@ -7,6 +7,23 @@ namespace Mospolyhelper.Domain.Account.Model
 {
     public class AccountApplication
     {
+        public AccountApplication(
+            string registrationNumber, 
+            string name, string dateTime, 
+            string status, string department, 
+            string note, 
+            string info
+            )
+        {
+            RegistrationNumber = registrationNumber;
+            Name = name;
+            DateTime = dateTime;
+            Status = status;
+            Department = department;
+            Note = note;
+            Info = info;
+        }
+
         public string RegistrationNumber { get; }
         public string Name { get; }
         public string DateTime { get; }
