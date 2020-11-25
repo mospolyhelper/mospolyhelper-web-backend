@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Data;
 using System.Linq;
 using System.Net;
@@ -10,6 +11,25 @@ using System.Web;
 
 namespace Mospolyhelper.Data.Account.Api
 {
+    public static class NameValueCollectionExtension
+    {
+        public static string ToWindows1251UrlEncodedQuery(this NameValueCollection nv)
+        {
+            StringBuilder sb = new StringBuilder();
+            bool firstIteration = true;
+            foreach (var key in nv.AllKeys)
+            {
+                if (!firstIteration)
+                    sb.Append("&");
+                sb.Append(HttpUtility.UrlEncode(key, Encoding.GetEncoding(1251)))
+                    .Append("=")
+                    .Append(HttpUtility.UrlEncode(nv[key], Encoding.GetEncoding(1251)));
+                firstIteration = false;
+            }
+            return sb.ToString();
+        }
+    }
+
     public class AccountClient
     {
         private const string UrlBase = "https://e.mospolytech.ru";
@@ -37,7 +57,7 @@ namespace Mospolyhelper.Data.Account.Api
             this.client = client;
         }
 
-        public async Task<string> GetSessionId(string login, string password)
+        public async Task<(bool, string?)> GetSessionId(string login, string password, string? sessionId = null)
         {
             var content = new[]
             {
@@ -49,14 +69,22 @@ namespace Mospolyhelper.Data.Account.Api
             {
                 RequestUri = new Uri(UrlAuth),
                 Method = HttpMethod.Post,
-                Content = new FormUrlEncodedContent(content)
+                Content = new FormUrlEncodedContent(content),
+                Headers = { { "Cookie", sessionId ?? string.Empty } }
             };
+
             var response = await client.SendAsync(request);
             response.EnsureSuccessStatusCode();
-            return string.Join(',',
+            var res = await response.Content.ReadAsStringAsync();
+            var cookie = response.Headers != null ? string.Join(',',
                 response.Headers
                     .SingleOrDefault(header => header.Key == "Set-Cookie").Value
-            );
+            ) : string.Empty;
+            if (res.Contains("upassword"))
+            {
+                return (false, cookie);
+            }
+            return (true, cookie);
         }
 
         public async Task<string> GetInfo(string sessionId)
@@ -96,6 +124,31 @@ namespace Mospolyhelper.Data.Account.Api
             return await response.Content.ReadAsStringAsync();
         }
 
+        public async Task<string> GetTeachers(string sessionId, string searchQuery, int page)
+        {
+            var builder = new UriBuilder(UrlTeachers);
+            var query = HttpUtility.ParseQueryString(builder.Query);
+            if (searchQuery != string.Empty)
+            {
+                query["objsearch"] = searchQuery;
+            }
+            if (page != 0)
+            {
+                query["pg"] = page.ToString();
+            }
+            builder.Query = query.ToWindows1251UrlEncodedQuery();
+            var url = builder.Uri;
+            var request = new HttpRequestMessage
+            {
+                RequestUri = url,
+                Method = HttpMethod.Get,
+                Headers = { { "Cookie", sessionId } }
+            };
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
         public async Task<string> GetMarks(string sessionId)
         {
             var request = new HttpRequestMessage
@@ -120,6 +173,55 @@ namespace Mospolyhelper.Data.Account.Api
             var response = await client.SendAsync(request);
             response.EnsureSuccessStatusCode();
             return await response.Content.ReadAsStringAsync();
+        }
+
+        public async Task<string> GetClassmates(string sessionId)
+        {
+            var request = new HttpRequestMessage
+            {
+                RequestUri = new Uri(UrlClassmates),
+                Method = HttpMethod.Get,
+                Headers = { { "Cookie", sessionId } }
+            };
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        public async Task<string> GetDialogs(string sessionId)
+        {
+            var request = new HttpRequestMessage
+            {
+                RequestUri = new Uri(UrlMessages),
+                Method = HttpMethod.Get,
+                Headers = { { "Cookie", sessionId } }
+            };
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        public async Task<string> GetDialog(string sessionId, string dialogKey)
+        {
+            var builder = new UriBuilder(UrlMessages);
+            var query = HttpUtility.ParseQueryString(builder.Query);
+            query["dlg"] = dialogKey;
+            builder.Query = query.ToString();
+            var url = builder.Uri;
+            var request = new HttpRequestMessage
+            {
+                RequestUri = url,
+                Method = HttpMethod.Get,
+                Headers = { { "Cookie", sessionId } }
+            };
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        public void SendMessage(string sessionId, string dialogKey, string message)
+        {
+
         }
     }
 }

@@ -8,6 +8,7 @@ namespace Mospolyhelper.Domain.Account.Model
     public class AccountPortfolio
     {
         public AccountPortfolio(
+            int id,
             string name, 
             string group, 
             string direction, 
@@ -16,6 +17,7 @@ namespace Mospolyhelper.Domain.Account.Model
             string educationForm
             )
         {
+            Id = id;
             Name = name;
             Group = group;
             Direction = direction;
@@ -24,6 +26,7 @@ namespace Mospolyhelper.Domain.Account.Model
             EducationForm = educationForm;
         }
 
+        public int Id { get; }
         public string Name { get; }
         public string Group { get; }
         public string Direction { get; }

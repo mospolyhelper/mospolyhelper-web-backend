@@ -18,25 +18,55 @@ namespace Mospolyhelper.Features.Controllers.Account
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly AccountClient useCase;
+        private readonly AccountClient api;
         private readonly AccountRemoteDataSource dataSource;
 
         public AccountController(AccountClient useCase, AccountRemoteDataSource dataSource)
         {
-            this.useCase = useCase;
+            this.api = useCase;
             this.dataSource = dataSource;
         }
 
+        public class AuthObj
+        {
+            public string Login { get; set; }
+            public string Password { get; set; }
+        }
+
+        [HttpPost("auth")]
+        public async Task<ActionResult<string>> GetSessionId(
+            [FromBody] AuthObj authObj,
+            [FromHeader] string? sessionId = ""
+            )
+        {
+            var (result, sessionIdRes) = await dataSource.GetSessionId(authObj.Login, authObj.Password, sessionId);
+            if (result)
+            {
+                return Ok(sessionIdRes);
+            }
+            else
+            {
+                return this.Problem(sessionIdRes);
+            }
+        }
+
         [HttpGet("portfolios")]
-        public async Task<ActionResult<IList<AccountPortfolio>>> Get([FromQuery] string? searchQuery = "", [FromQuery] int page = 0)
+        public async Task<ActionResult<IList<AccountPortfolio>>> GetPortfolios(
+            [FromQuery] string? searchQuery = "", 
+            [FromQuery] int page = 0
+            )
         {
             return Ok(await dataSource.GetPortfolios(searchQuery ?? string.Empty, page));
         }
 
-        [HttpGet("auth")]
-        public async Task<ActionResult<string>> GetSessionId([FromQuery] string login, [FromQuery] string password)
+        [HttpGet("teachers")]
+        public async Task<ActionResult<IList<AccountTeacher>>> GetTeachers(
+            [FromHeader] string sessionId,
+            [FromQuery] string? searchQuery = "",
+            [FromQuery] int page = 0
+            )
         {
-            return Ok(await useCase.GetSessionId(login, password));
+            return Ok(await dataSource.GetTeachers(sessionId, searchQuery ?? string.Empty, page));
         }
 
         [HttpGet("info")]
@@ -46,15 +76,36 @@ namespace Mospolyhelper.Features.Controllers.Account
         }
 
         [HttpGet("marks")]
-        public async Task<ActionResult<string>> GetMarks([FromHeader] string sessionId)
+        public async Task<ActionResult<AccountMarks>> GetMarks([FromHeader] string sessionId)
         {
             return Ok(await dataSource.GetMarks(sessionId));
         }
 
         [HttpGet("applications")]
-        public async Task<ActionResult<string>> GetApplications([FromHeader] string sessionId)
+        public async Task<ActionResult<IList<AccountApplication>>> GetApplications([FromHeader] string sessionId)
         {
-            return Ok(await useCase.GetApplications(sessionId));
+            return Ok(await dataSource.GetApplications(sessionId));
+        }
+
+        [HttpGet("classmates")]
+        public async Task<ActionResult<IList<AccountClassmate>>> GetClassmates([FromHeader] string sessionId)
+        {
+            return Ok(await dataSource.GetClassmates(sessionId));
+        }
+
+        [HttpGet("dialogs")]
+        public async Task<ActionResult<IList<AccountDialogPreview>>> GetMessages([FromHeader] string sessionId)
+        {
+            return Ok(await dataSource.GetDialogs(sessionId));
+        }
+
+        [HttpGet("dialog")]
+        public async Task<ActionResult<IList<AccountMessage>>> GetMessages(
+            [FromHeader] string sessionId,
+            [FromQuery] string dialogKey
+            )
+        {
+            return Ok(await dataSource.GetDialog(sessionId, dialogKey));
         }
     }
 }
