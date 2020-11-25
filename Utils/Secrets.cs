@@ -8,8 +8,8 @@ namespace Mospolyhelper.Utils
     public static partial class Secrets
     {
         public static readonly string URL_SCHEDULE_SESSION_ALL = 
-            Environment.GetEnvironmentVariable(URL_SCHEDULE_SESSION_ALL) ?? string.Empty;
+            Environment.GetEnvironmentVariable("URL_SCHEDULE_SESSION_ALL") ?? string.Empty;
         public static readonly string URL_SCHEDULE_ALL =
-            Environment.GetEnvironmentVariable(URL_SCHEDULE_ALL) ?? string.Empty;
+            Environment.GetEnvironmentVariable("URL_SCHEDULE_ALL") ?? string.Empty;
     }
 }
