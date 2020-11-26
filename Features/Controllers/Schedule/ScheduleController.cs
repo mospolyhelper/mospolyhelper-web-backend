@@ -1,33 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
-using System.Linq;
-using System.Net.Http;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
-using Mospolyhelper.Data.Schedule.Api;
-using Mospolyhelper.Data.Schedule.Converters;
-using Mospolyhelper.Data.Schedule.Remote;
-using Mospolyhelper.Data.Schedule.Repository;
 using Mospolyhelper.Domain.Schedule.UseCase;
 
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace Mospolyhelper.Features.Controllers.Schedule
 {
-    [Route("[controller]")]
     [ApiController]
+    [Route("[controller]")]
+    [Produces("application/json")]
     public class ScheduleController : ControllerBase
     {
-        // TODO: Make injecting
         private readonly ScheduleUseCase useCase;
 
         public ScheduleController(ScheduleUseCase useCase)
         {
             this.useCase = useCase;
         }
-        [EnableCors("MyPolicy")]
+
         [HttpGet("schedule")]
         public async Task<ActionResult<Domain.Schedule.Model.Schedule?>> Get([FromQuery] string id)
         {
