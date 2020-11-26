@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Net.Http;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Mospolyhelper.Data.Account.Api;
 using Mospolyhelper.Data.Account.Remote;
@@ -14,8 +7,9 @@ using Mospolyhelper.Domain.Account.Model;
 
 namespace Mospolyhelper.Features.Controllers.Account
 {
-    [Route("[controller]")]
     [ApiController]
+    [Route("[controller]")]
+    [Produces("application/json")]
     public class AccountController : ControllerBase
     {
         private readonly AccountClient api;
