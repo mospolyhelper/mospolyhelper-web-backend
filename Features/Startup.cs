@@ -46,7 +46,7 @@ namespace Mospolyhelper
         {
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
-                builder.WithOrigins("http://localhost:1525")
+                builder.WithOrigins("http://localhost:1427", "https://mospolyhelper.github.io/")
                        .AllowAnyMethod()
                        .AllowCredentials()
                        .AllowAnyHeader();

@@ -7,7 +7,14 @@ namespace Mospolyhelper.Domain.Account.Model
 {
     public class AccountTeacher
     {
-        public AccountTeacher(int id, string name, string info, string avatarUrl, string status, string dialogKey)
+        public AccountTeacher(
+            int id, 
+            string name, 
+            string info, 
+            string avatarUrl, 
+            string status, 
+            string dialogKey
+            )
         {
             Id = id;
             Name = name;
