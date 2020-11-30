@@ -147,6 +147,7 @@ namespace Mospolyhelper
             builder.RegisterModule(new CoreModule());
             builder.RegisterModule(new ScheduleModule());
             builder.RegisterModule(new AccountModule());
+            builder.RegisterModule(new MapModule());
         }
     }
 }
