@@ -1,8 +1,11 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Autofac;
@@ -32,7 +35,6 @@ namespace Mospolyhelper
         }
     }
 
-
     public class Startup
     {
         public Startup(IConfiguration configuration)
@@ -46,9 +48,10 @@ namespace Mospolyhelper
         {
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
-                builder.WithOrigins("http://localhost:1427", "https://mospolyhelper.github.io/")
+                builder//.WithOrigins("http://localhost:1427", "https://mospolyhelper.github.io/")
+                        .AllowAnyOrigin()
                        .AllowAnyMethod()
-                       .AllowCredentials()
+                       //.AllowCredentials()
                        .AllowAnyHeader();
             }));
             services.AddControllers(options =>

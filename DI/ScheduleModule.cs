@@ -5,6 +5,7 @@ using System.Text;
 using Autofac;
 using Mospolyhelper.Data.Schedule.Api;
 using Mospolyhelper.Data.Schedule.Converters;
+using Mospolyhelper.Data.Schedule.Local;
 using Mospolyhelper.Data.Schedule.Remote;
 using Mospolyhelper.Data.Schedule.Repository;
 using Mospolyhelper.Domain.Schedule.Repository;
@@ -42,10 +43,18 @@ namespace Mospolyhelper.DI
                 .As<ScheduleRemoteDataSource>()
                 .SingleInstance();
 
+            builder
+                .Register(c => new ScheduleLocalDataSource())
+                .As<ScheduleLocalDataSource>()
+                .SingleInstance();
+
 
             // Repositories
             builder
-                .Register(c => new ScheduleRepository(c.Resolve<ScheduleRemoteDataSource>()))
+                .Register(c => new ScheduleRepository(
+                    c.Resolve<ScheduleRemoteDataSource>(),
+                    c.Resolve<ScheduleLocalDataSource>()
+                    ))
                 .As<IScheduleRepository>()
                 .SingleInstance();
 
