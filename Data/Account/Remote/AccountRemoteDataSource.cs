@@ -19,6 +19,11 @@ namespace Mospolyhelper.Data.Account.Remote
             this.converter = converter;
         }
 
+        private bool CheckAuthorization(string html)
+        {
+            return true;
+        }
+
         public async Task<(bool, string?)> GetSessionId(string login, string password, string? sessionId = null)
         {
             try
@@ -46,17 +51,22 @@ namespace Mospolyhelper.Data.Account.Remote
             }
         }
 
-        public async Task<IList<AccountTeacher>> GetTeachers(string sessionId, string searchQuery, int page)
+        public async Task<AccountResult<IList<AccountTeacher>>> GetTeachers(string sessionId, string searchQuery, int page)
         {
             try
             {
                 var teachersString = await client.GetTeachers(sessionId, searchQuery, page);
-                return converter.ParseTeachers(teachersString);
+                var isAuthorized = CheckAuthorization(teachersString);
+                if (!isAuthorized)
+                {
+                    return new AccountResult<IList<AccountTeacher>>(null, false, false);
+                }
+                return new AccountResult<IList<AccountTeacher>>(converter.ParseTeachers(teachersString), true, true); 
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return Array.Empty<AccountTeacher>();
+                return new AccountResult<IList<AccountTeacher>>(Array.Empty<AccountTeacher>(), false, false);
             }
         }
 

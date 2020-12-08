@@ -112,7 +112,7 @@ namespace Mospolyhelper.Data.Account.Api
             {
                 query["pg"] = page.ToString();
             }
-            builder.Query = query.ToString();
+            builder.Query = query.ToWindows1251UrlEncodedQuery();
             var url = builder.Uri;
             var request = new HttpRequestMessage
             {
