@@ -1,6 +1,7 @@
 ﻿using Mospolyhelper.Data.Account.Api;
 using Mospolyhelper.Data.Account.Converters;
 using Mospolyhelper.Domain.Account.Model;
+using Mospolyhelper.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -37,21 +38,21 @@ namespace Mospolyhelper.Data.Account.Remote
             }
         }
 
-        public async Task<IList<AccountPortfolio>> GetPortfolios(string searchQuery, int page)
+        public async Task<AccountStudents> GetPortfolios(string searchQuery, int page)
         {
             try
             {
                 var portfoliosString = await client.GetPortfolio(searchQuery, page);
-                return converter.ParsePortfolios(portfoliosString);
+                return converter.ParsePortfolios(portfoliosString, page);
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return Array.Empty<AccountPortfolio>();
+                return null;
             }
         }
 
-        public async Task<AccountResult<IList<AccountTeacher>>> GetTeachers(string sessionId, string searchQuery, int page)
+        public async Task<Result<IList<AccountTeacher>>> GetTeachers(string sessionId, string searchQuery, int page)
         {
             try
             {
@@ -59,14 +60,14 @@ namespace Mospolyhelper.Data.Account.Remote
                 var isAuthorized = CheckAuthorization(teachersString);
                 if (!isAuthorized)
                 {
-                    return new AccountResult<IList<AccountTeacher>>(null, false, false);
+                    return Result<IList<AccountTeacher>>.Failure(new UnauthorizedAccessException());
                 }
-                return new AccountResult<IList<AccountTeacher>>(converter.ParseTeachers(teachersString), true, true); 
+                return Result<IList<AccountTeacher>>.Success(converter.ParseTeachers(teachersString)); 
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return new AccountResult<IList<AccountTeacher>>(Array.Empty<AccountTeacher>(), false, false);
+                return Result<IList<AccountTeacher>>.Failure(e);
             }
         }
 

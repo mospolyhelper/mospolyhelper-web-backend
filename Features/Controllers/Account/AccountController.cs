@@ -1,9 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Mospolyhelper.Data.Account.Api;
 using Mospolyhelper.Data.Account.Remote;
 using Mospolyhelper.Domain.Account.Model;
+using Mospolyhelper.Utils;
 
 namespace Mospolyhelper.Features.Controllers.Account
 {
@@ -45,9 +47,9 @@ namespace Mospolyhelper.Features.Controllers.Account
         }
 
         [HttpGet("portfolios")]
-        public async Task<ActionResult<IList<AccountPortfolio>>> GetPortfolios(
+        public async Task<ActionResult<AccountStudents>> GetPortfolios(
             [FromQuery] string? searchQuery = "", 
-            [FromQuery] int page = 0
+            [FromQuery] int page = 1
             )
         {
             return Ok(await dataSource.GetPortfolios(searchQuery ?? string.Empty, page));
@@ -60,7 +62,21 @@ namespace Mospolyhelper.Features.Controllers.Account
             [FromQuery] int page = 0
             )
         {
-            return Ok(await dataSource.GetTeachers(sessionId, searchQuery ?? string.Empty, page));
+            var res = await dataSource.GetTeachers(sessionId, searchQuery ?? string.Empty, page);
+            if (res.IsSuccess)
+            {
+                return Ok(res.GetOrNull());
+            }
+            else if (res.IsFailure)
+            {
+                switch (res.ExceptionOrNull())
+                {
+                    case UnauthorizedAccessException e:
+                        return Unauthorized();
+                    default: return StatusCode(500);
+                }
+            }
+            return StatusCode(500);
         }
 
         [HttpGet("info")]
