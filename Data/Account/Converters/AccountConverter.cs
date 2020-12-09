@@ -11,16 +11,37 @@ namespace Mospolyhelper.Data.Account.Converters
 {
     public class AccountConverter
     {
-        public IList<AccountPortfolio> ParsePortfolios(string portfolios)
+        public AccountStudents ParsePortfolios(string portfolios, int page)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml(portfolios);
 
-            return doc.DocumentNode.Descendants("td")
+            var maxPage = new Regex("p=portfolio.*?pg=(.*?)\"")
+                .Matches(doc.DocumentNode.InnerHtml)
+                .Select(it => {
+                    if (int.TryParse(it.Groups[1].Value, out int res))
+                    {
+                        return res as int?;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }).Where(it => it is int)
+                .Max(it => it!.Value);
+            
+
+            var portfolioList = doc.DocumentNode.Descendants("td")
                 .Where(it =>
                     it.InnerText.Contains("Группа", StringComparison.InvariantCultureIgnoreCase)
                 ).Select(it => ParsePortfolio(it.Descendants("div")))
                 .ToList();
+
+            return new AccountStudents(
+                maxPage,
+                page,
+                portfolioList
+                );
         }
 
         private AccountPortfolio ParsePortfolio(IEnumerable<HtmlNode> portfolio)
