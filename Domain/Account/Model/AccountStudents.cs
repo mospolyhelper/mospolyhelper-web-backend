@@ -4,15 +4,15 @@
 
     public class AccountStudents
     {
-        public AccountStudents(int pageCount, int currentPage, IList<AccountPortfolio> portolios)
+        public AccountStudents(int pageCount, int currentPage, IList<AccountPortfolio> portfolios)
         {
             PageCount = pageCount;
             CurrentPage = currentPage;
-            Portolios = portolios;
+            Portfolios = portfolios;
         }
 
         public int PageCount { get; }
         public int CurrentPage { get; }
-        public IList<AccountPortfolio> Portolios { get; }
+        public IList<AccountPortfolio> Portfolios { get; }
     }
 }
