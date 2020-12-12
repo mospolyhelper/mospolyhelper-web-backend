@@ -27,22 +27,22 @@ namespace Mospolyhelper.Features.Controllers.Account
         {
             public string Login { get; set; }
             public string Password { get; set; }
+            public string SessionId { get; set; } = string.Empty;
         }
 
         [HttpPost("auth")]
         public async Task<ActionResult<string>> GetSessionId(
-            [FromBody] AuthObj authObj,
-            [FromHeader] string? sessionId = ""
+            [FromBody] AuthObj authObj
             )
         {
-            var (result, sessionIdRes) = await dataSource.GetSessionId(authObj.Login, authObj.Password, sessionId);
+            var (result, sessionIdRes) = await dataSource.GetSessionId(authObj.Login, authObj.Password, authObj.SessionId);
             if (result)
             {
                 return Ok(sessionIdRes);
             }
             else
             {
-                return this.Problem(sessionIdRes);
+                return Unauthorized();
             }
         }
 
@@ -56,10 +56,10 @@ namespace Mospolyhelper.Features.Controllers.Account
         }
 
         [HttpGet("teachers")]
-        public async Task<ActionResult<IList<AccountTeacher>>> GetTeachers(
+        public async Task<ActionResult<AccountTeachers>> GetTeachers(
             [FromHeader] string sessionId,
             [FromQuery] string? searchQuery = "",
-            [FromQuery] int page = 0
+            [FromQuery] int page = 1
             )
         {
             var res = await dataSource.GetTeachers(sessionId, searchQuery ?? string.Empty, page);
@@ -69,12 +69,11 @@ namespace Mospolyhelper.Features.Controllers.Account
             }
             else if (res.IsFailure)
             {
-                switch (res.ExceptionOrNull())
+                return (res.ExceptionOrNull()) switch
                 {
-                    case UnauthorizedAccessException e:
-                        return Unauthorized();
-                    default: return StatusCode(500);
-                }
+                    UnauthorizedAccessException e => Unauthorized(),
+                    _ => StatusCode(500),
+                };
             }
             return StatusCode(500);
         }

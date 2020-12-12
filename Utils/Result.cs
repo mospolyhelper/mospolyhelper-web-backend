@@ -15,7 +15,7 @@ namespace Mospolyhelper.Utils
          * Returns `true` if this instance represents a successful outcome.
          * In this case [isFailure] returns `false`.
          */
-        public bool IsSuccess => Value! is Failure && Value! is Loading;
+        public bool IsSuccess => !(Value is Failure) && !(Value is Loading);
 
         /**
          * Returns `true` if this instance represents a failed outcome.
