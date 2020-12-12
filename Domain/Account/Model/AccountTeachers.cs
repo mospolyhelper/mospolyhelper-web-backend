@@ -2,17 +2,17 @@
 {
     using System.Collections.Generic;
 
-    public class AccountStudents
+    public class AccountTeachers
     {
-        public AccountStudents(int pageCount, int currentPage, IList<AccountPortfolio> portolios)
+        public AccountTeachers(int pageCount, int currentPage, IList<AccountTeacher> teachers)
         {
             PageCount = pageCount;
             CurrentPage = currentPage;
-            Portolios = portolios;
+            Teachers = teachers;
         }
 
         public int PageCount { get; }
         public int CurrentPage { get; }
-        public IList<AccountPortfolio> Portolios { get; }
+        public IList<AccountTeacher> Teachers { get; }
     }
 }

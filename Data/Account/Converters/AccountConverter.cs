@@ -28,6 +28,7 @@ namespace Mospolyhelper.Data.Account.Converters
                         return null;
                     }
                 }).Where(it => it is int)
+                .Append(1)
                 .Max(it => it!.Value);
             
 
@@ -76,54 +77,78 @@ namespace Mospolyhelper.Data.Account.Converters
                 );
         }
 
-        public IList<AccountTeacher> ParseTeachers(string teachers)
+        public AccountTeachers ParseTeachers(string teachers, int page)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml(teachers);
+
+            var maxPage = new Regex("p=teachers.*?pg=(.*?)\"")
+                .Matches(doc.DocumentNode.InnerHtml)
+                .Select(it => {
+                    if (int.TryParse(it.Groups[1].Value, out int res))
+                    {
+                        return res as int?;
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }).Where(it => it is int)
+                .Append(1)
+                .Max(it => it!.Value);
+
+            IList<AccountTeacher> resList = new List<AccountTeacher>();
             var table = doc.DocumentNode.Descendants("table").LastOrDefault();
             if (table == null)
             {
-                return Array.Empty<AccountTeacher>();
+                resList = Array.Empty<AccountTeacher>();
             }
-            var resList = new List<AccountTeacher>();
-            var trs = table.Descendants("tr");
-            foreach (var tr in trs)
+            else
             {
-                var id = int.Parse(
-                    tr.GetAttributeValue("id", "t_-1")
-                    .Split('_', StringSplitOptions.RemoveEmptyEntries)
-                    .LastOrDefault() ?? "-1"
+                resList = table.Descendants("tr").Select(tr => ParseTeacher(tr)).ToList();
+            }
+
+            return new AccountTeachers(
+                    maxPage,
+                    page,
+                    resList
                     );
-                var tds = tr.Descendants("td").GetEnumerator();
-                tds.MoveNext();
-                var imageUrl = tds.Current.Descendants("img").FirstOrDefault()
-                    ?.GetAttributeValue("src", "img/no_avatar.jpg") ?? "img/no_avatar.jpg";
-                tds.MoveNext();
-                var status = tds.Current.Descendants("img").FirstOrDefault()
-                    ?.GetAttributeValue("title", "offline") ?? "offline";
-                tds.MoveNext();
-                var name = tds.Current.Descendants("b").FirstOrDefault()?.InnerText ?? "Имя не найдено";
-                var info = tds.Current.Descendants("font").FirstOrDefault()?.InnerText ?? string.Empty;
-                tds.MoveNext();
-                var messageKey = tds.Current.Descendants("a").FirstOrDefault()
-                    ?.GetAttributeValue("onclick", string.Empty)
-                    ?.Split("'", StringSplitOptions.RemoveEmptyEntries)
-                    ?.ElementAtOrDefault(1)
-                    ?.Split("&u=", StringSplitOptions.RemoveEmptyEntries)
-                    ?.LastOrDefault() ?? string.Empty;
-                messageKey = HttpUtility.UrlDecode(messageKey);
-                resList.Add(
-                    new AccountTeacher(
+        }
+
+        private AccountTeacher ParseTeacher(HtmlNode tr)
+        {
+            var id = int.Parse(
+                   tr.GetAttributeValue("id", "t_-1")
+                   .Split('_', StringSplitOptions.RemoveEmptyEntries)
+                   .LastOrDefault() ?? "-1"
+                   );
+            var tds = tr.Descendants("td").GetEnumerator();
+            tds.MoveNext();
+            var imageUrl = tds.Current.Descendants("img").FirstOrDefault()
+                ?.GetAttributeValue("src", "img/no_avatar.jpg") ?? "img/no_avatar.jpg";
+            tds.MoveNext();
+            var status = tds.Current.Descendants("img").FirstOrDefault()
+                ?.GetAttributeValue("title", "offline") ?? "offline";
+            tds.MoveNext();
+            var name = tds.Current.Descendants("b").FirstOrDefault()?.InnerText ?? "Имя не найдено";
+            var info = tds.Current.Descendants("font").FirstOrDefault()?.InnerText ?? string.Empty;
+            tds.MoveNext();
+            var messageKey = tds.Current.Descendants("a").FirstOrDefault()
+                ?.GetAttributeValue("onclick", string.Empty)
+                ?.Split("'", StringSplitOptions.RemoveEmptyEntries)
+                ?.ElementAtOrDefault(1)
+                ?.Split("&u=", StringSplitOptions.RemoveEmptyEntries)
+                ?.LastOrDefault() ?? string.Empty;
+            messageKey = HttpUtility.UrlDecode(messageKey);
+
+            return new AccountTeacher(
                         id,
                         name,
                         info,
                         imageUrl,
                         status,
                         messageKey
-                        )
-                    );
-            }
-            return resList;
+                        );
         }
 
 

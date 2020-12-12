@@ -8,7 +8,7 @@ namespace Mospolyhelper.DI
         protected override void Load(ContainerBuilder builder)
         {
             builder
-                .Register(c => new HttpClient())
+                .Register(c => new HttpClient(new HttpClientHandler { UseCookies = false }))
                 .As<HttpClient>()
                 .SingleInstance();
         }

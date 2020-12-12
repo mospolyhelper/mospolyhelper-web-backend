@@ -48,11 +48,11 @@ namespace Mospolyhelper.Data.Account.Remote
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return null;
+                return new AccountStudents(1, 1, Array.Empty<AccountPortfolio>());
             }
         }
 
-        public async Task<Result<IList<AccountTeacher>>> GetTeachers(string sessionId, string searchQuery, int page)
+        public async Task<Result<AccountTeachers>> GetTeachers(string sessionId, string searchQuery, int page)
         {
             try
             {
@@ -60,14 +60,14 @@ namespace Mospolyhelper.Data.Account.Remote
                 var isAuthorized = CheckAuthorization(teachersString);
                 if (!isAuthorized)
                 {
-                    return Result<IList<AccountTeacher>>.Failure(new UnauthorizedAccessException());
+                    return Result<AccountTeachers>.Failure(new UnauthorizedAccessException());
                 }
-                return Result<IList<AccountTeacher>>.Success(converter.ParseTeachers(teachersString)); 
+                return Result<AccountTeachers>.Success(converter.ParseTeachers(teachersString, page)); 
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return Result<IList<AccountTeacher>>.Failure(e);
+                return Result<AccountTeachers>.Failure(e);
             }
         }
 
