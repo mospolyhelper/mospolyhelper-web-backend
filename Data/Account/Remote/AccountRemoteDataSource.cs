@@ -22,7 +22,7 @@ namespace Mospolyhelper.Data.Account.Remote
 
         private bool CheckAuthorization(string html)
         {
-            return true;
+            return !html.Contains("upassword");
         }
 
         public async Task<(bool, string?)> GetSessionId(string login, string password, string? sessionId = null)
