@@ -491,5 +491,28 @@ namespace Mospolyhelper.Data.Account.Converters
             }
             return resList;
         }
+
+        public MyPortfolio ParseMyPortfolio(string html)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(html);
+
+            var otherInfo = doc.DocumentNode
+                .Descendants("textarea")
+                .Where(it =>
+                it.GetAttributeValue("name", string.Empty) == "otherinfo"
+                ).FirstOrDefault()?.InnerText ?? string.Empty; ;
+
+            var otherInfoIsPublic = doc.DocumentNode
+                .Descendants("input")
+                .Where(it => 
+                it.GetAttributeValue("name", string.Empty) == "acces_otherinfo"
+                ).FirstOrDefault()?.GetAttributeValue("value", 0) == 1;
+            
+            return new MyPortfolio(
+                otherInfo,
+                otherInfoIsPublic
+                );
+        }
     }
 }

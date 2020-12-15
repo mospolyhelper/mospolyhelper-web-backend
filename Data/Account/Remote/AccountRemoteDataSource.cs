@@ -184,5 +184,43 @@ namespace Mospolyhelper.Data.Account.Remote
                 return Result<IList<AccountMessage>>.Failure(e);
             }
         }
+
+        public async Task<Result<MyPortfolio>> GetMyPortfolio(string sessionId)
+        {
+            try
+            {
+                var res = await client.GetMyPortfolio(sessionId);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<MyPortfolio>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<MyPortfolio>.Success(converter.ParseMyPortfolio(res));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Result<MyPortfolio>.Failure(e);
+            }
+        }
+
+        public async Task<Result<MyPortfolio>> SetMyPortfolio(string sessionId, string otherInfo, bool isPublic)
+        {
+            try
+            {
+                var res = await client.SetMyPortfolio(sessionId, otherInfo, isPublic);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<MyPortfolio>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<MyPortfolio>.Success(converter.ParseMyPortfolio(res));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Result<MyPortfolio>.Failure(e);
+            }
+        }
     }
 }

@@ -97,19 +97,20 @@ namespace Mospolyhelper.Data.Account.Api
                 var cookieValue = HttpUtility.UrlDecode(valueString);
                 return cookieValue;
             }
-            catch(Exception)
+            catch (Exception)
             {
                 return null;
             }
         }
 
-        private async Task<string> GetResponse(Uri url, HttpMethod method, string sessionId = "")
+        private async Task<string> GetResponse(Uri url, HttpMethod method, string sessionId = "", HttpContent? content = null)
         {
             var request = new HttpRequestMessage
             {
                 RequestUri = url,
                 Method = method,
-                Headers = { { "Cookie", $"PHPSESSID={sessionId}" } }
+                Headers = { { "Cookie", $"PHPSESSID={sessionId}" } },
+                Content = content
             };
             var response = await client.SendAsync(request);
             response.EnsureSuccessStatusCode();
@@ -188,6 +189,23 @@ namespace Mospolyhelper.Data.Account.Api
         public void SendMessage(string sessionId, string dialogKey, string message)
         {
 
+        }
+
+        public Task<string> GetMyPortfolio(string sessionId)
+        {
+            return GetResponse(new Uri(UrlMyPortfolio), HttpMethod.Get, sessionId);
+        }
+
+        public Task<string> SetMyPortfolio(string sessionId, string otherInfo, bool isPublic)
+        {
+            var formContent = new FormUrlEncodedContent(new[]
+            {
+                new KeyValuePair<string, string>("otherinfo", otherInfo),
+                new KeyValuePair<string, string>("acces_otherinfo", isPublic ? "1" : "0"),
+                new KeyValuePair<string, string>("action", "save_portfolio")
+            });
+
+            return GetResponse(new Uri(UrlMyPortfolio), HttpMethod.Post, sessionId, formContent);
         }
     }
 }

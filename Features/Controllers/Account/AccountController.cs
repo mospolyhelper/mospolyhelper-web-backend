@@ -232,5 +232,62 @@ namespace Mospolyhelper.Features.Controllers.Account
             }
             return StatusCode(500);
         }
+
+        [HttpGet("myportfolio")]
+        public async Task<ActionResult<MyPortfolio>> GetMyPortfolio(
+            [FromHeader] string? sessionId = ""
+            )
+        {
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Unauthorized();
+            }
+            var res = await dataSource.GetMyPortfolio(sessionId);
+            if (res.IsSuccess)
+            {
+                return Ok(res.GetOrNull());
+            }
+            else if (res.IsFailure)
+            {
+                return (res.ExceptionOrNull()) switch
+                {
+                    UnauthorizedAccessException e => Unauthorized(),
+                    _ => StatusCode(500),
+                };
+            }
+            return StatusCode(500);
+        }
+
+        [HttpPost("myportfolio")]
+        public async Task<ActionResult<MyPortfolio>> SetMyPortfolio(
+            [FromBody] MyPortfolio portfolio,
+            [FromHeader] string? sessionId = ""
+            )
+        {
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Unauthorized();
+            }
+            var res = await dataSource.SetMyPortfolio(sessionId, portfolio.OtherInformation, portfolio.IsPublic);
+            if (res.IsSuccess)
+            {
+                return Ok(res.GetOrNull());
+            }
+            else if (res.IsFailure)
+            {
+                return (res.ExceptionOrNull()) switch
+                {
+                    UnauthorizedAccessException e => Unauthorized(),
+                    _ => StatusCode(500),
+                };
+            }
+            return StatusCode(500);
+        }
+
+        public class MyPortfolio
+        {
+            public string OtherInformation { get; set; } = string.Empty;
+            public bool IsPublic { get; set; }
+        }
     }
 }
