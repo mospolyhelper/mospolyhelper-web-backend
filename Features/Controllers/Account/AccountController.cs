@@ -57,11 +57,15 @@ namespace Mospolyhelper.Features.Controllers.Account
 
         [HttpGet("teachers")]
         public async Task<ActionResult<AccountTeachers>> GetTeachers(
-            [FromHeader] string sessionId,
             [FromQuery] string? searchQuery = "",
-            [FromQuery] int page = 1
+            [FromQuery] int page = 1,
+            [FromHeader] string? sessionId = ""
             )
         {
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Unauthorized();
+            }
             var res = await dataSource.GetTeachers(sessionId, searchQuery ?? string.Empty, page);
             if (res.IsSuccess)
             {
@@ -78,43 +82,155 @@ namespace Mospolyhelper.Features.Controllers.Account
             return StatusCode(500);
         }
 
-        [HttpGet("info")]
-        public async Task<ActionResult<AccountInfo?>> GetInfo([FromHeader] string sessionId)
+        [HttpGet("classmates")]
+        public async Task<ActionResult<IList<AccountClassmate>>> GetClassmates(
+            [FromHeader] string? sessionId = ""
+            )
         {
-            return Ok(await dataSource.GetInfo(sessionId));
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Unauthorized();
+            }
+            var res = await dataSource.GetClassmates(sessionId);
+            if (res.IsSuccess)
+            {
+                return Ok(res.GetOrNull());
+            }
+            else if (res.IsFailure)
+            {
+                return (res.ExceptionOrNull()) switch
+                {
+                    UnauthorizedAccessException e => Unauthorized(),
+                    _ => StatusCode(500),
+                };
+            }
+            return StatusCode(500);
+        }
+
+        [HttpGet("info")]
+        public async Task<ActionResult<AccountInfo?>> GetInfo(
+            [FromHeader] string? sessionId = ""
+            )
+        {
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Unauthorized();
+            }
+            var res = await dataSource.GetInfo(sessionId);
+            if (res.IsSuccess)
+            {
+                return Ok(res.GetOrNull());
+            }
+            else if (res.IsFailure)
+            {
+                return (res.ExceptionOrNull()) switch
+                {
+                    UnauthorizedAccessException e => Unauthorized(),
+                    _ => StatusCode(500),
+                };
+            }
+            return StatusCode(500);
         }
 
         [HttpGet("marks")]
-        public async Task<ActionResult<AccountMarks>> GetMarks([FromHeader] string sessionId)
+        public async Task<ActionResult<AccountMarks>> GetMarks(
+            [FromHeader] string? sessionId = ""
+            )
         {
-            return Ok(await dataSource.GetMarks(sessionId));
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Unauthorized();
+            }
+            var res = await dataSource.GetMarks(sessionId);
+            if (res.IsSuccess)
+            {
+                return Ok(res.GetOrNull());
+            }
+            else if (res.IsFailure)
+            {
+                return (res.ExceptionOrNull()) switch
+                {
+                    UnauthorizedAccessException e => Unauthorized(),
+                    _ => StatusCode(500),
+                };
+            }
+            return StatusCode(500);
         }
 
         [HttpGet("applications")]
-        public async Task<ActionResult<IList<AccountApplication>>> GetApplications([FromHeader] string sessionId)
+        public async Task<ActionResult<IList<AccountApplication>>> GetApplications(
+            [FromHeader] string? sessionId = ""
+            )
         {
-            return Ok(await dataSource.GetApplications(sessionId));
-        }
-
-        [HttpGet("classmates")]
-        public async Task<ActionResult<IList<AccountClassmate>>> GetClassmates([FromHeader] string sessionId)
-        {
-            return Ok(await dataSource.GetClassmates(sessionId));
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Unauthorized();
+            }
+            var res = await dataSource.GetApplications(sessionId);
+            if (res.IsSuccess)
+            {
+                return Ok(res.GetOrNull());
+            }
+            else if (res.IsFailure)
+            {
+                return (res.ExceptionOrNull()) switch
+                {
+                    UnauthorizedAccessException e => Unauthorized(),
+                    _ => StatusCode(500),
+                };
+            }
+            return StatusCode(500);
         }
 
         [HttpGet("dialogs")]
-        public async Task<ActionResult<IList<AccountDialogPreview>>> GetMessages([FromHeader] string sessionId)
+        public async Task<ActionResult<IList<AccountDialogPreview>>> GetMessages(
+            [FromHeader] string? sessionId = ""
+            )
         {
-            return Ok(await dataSource.GetDialogs(sessionId));
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Unauthorized();
+            }
+            var res = await dataSource.GetDialogs(sessionId);
+            if (res.IsSuccess)
+            {
+                return Ok(res.GetOrNull());
+            }
+            else if (res.IsFailure)
+            {
+                return (res.ExceptionOrNull()) switch
+                {
+                    UnauthorizedAccessException e => Unauthorized(),
+                    _ => StatusCode(500),
+                };
+            }
+            return StatusCode(500);
         }
 
         [HttpGet("dialog")]
         public async Task<ActionResult<IList<AccountMessage>>> GetMessages(
-            [FromHeader] string sessionId,
-            [FromQuery] string dialogKey
+            [FromQuery] string dialogKey,
+            [FromHeader] string? sessionId = ""
             )
         {
-            return Ok(await dataSource.GetDialog(sessionId, dialogKey));
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Unauthorized();
+            }
+            var res = await dataSource.GetDialog(sessionId, dialogKey);
+            if (res.IsSuccess)
+            {
+                return Ok(res.GetOrNull());
+            }
+            else if (res.IsFailure)
+            {
+                return (res.ExceptionOrNull()) switch
+                {
+                    UnauthorizedAccessException e => Unauthorized(),
+                    _ => StatusCode(500),
+                };
+            }
+            return StatusCode(500);
         }
     }
 }

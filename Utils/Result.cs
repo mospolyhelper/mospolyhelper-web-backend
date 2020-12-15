@@ -82,7 +82,7 @@ namespace Mospolyhelper.Utils
         /**
          * Returns an instance that encapsulates the given [value] as successful value.
          */
-        public static Result<T> Success(T value) => new Result<T>(value);
+        public static Result<T> Success(T? value) => new Result<T>(value);
 
         /**
          * Returns an instance that encapsulates the given [Throwable] [exception] as failure.
