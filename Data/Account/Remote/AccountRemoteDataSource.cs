@@ -42,8 +42,8 @@ namespace Mospolyhelper.Data.Account.Remote
         {
             try
             {
-                var portfoliosString = await client.GetPortfolio(searchQuery, page);
-                return converter.ParsePortfolios(portfoliosString, page);
+                var res = await client.GetPortfolio(searchQuery, page);
+                return converter.ParsePortfolios(res, page);
             }
             catch (Exception e)
             {
@@ -56,13 +56,13 @@ namespace Mospolyhelper.Data.Account.Remote
         {
             try
             {
-                var teachersString = await client.GetTeachers(sessionId, searchQuery, page);
-                var isAuthorized = CheckAuthorization(teachersString);
+                var res = await client.GetTeachers(sessionId, searchQuery, page);
+                var isAuthorized = CheckAuthorization(res);
                 if (!isAuthorized)
                 {
                     return Result<AccountTeachers>.Failure(new UnauthorizedAccessException());
                 }
-                return Result<AccountTeachers>.Success(converter.ParseTeachers(teachersString, page)); 
+                return Result<AccountTeachers>.Success(converter.ParseTeachers(res, page)); 
             }
             catch (Exception e)
             {
@@ -71,87 +71,117 @@ namespace Mospolyhelper.Data.Account.Remote
             }
         }
 
-        public async Task<AccountInfo?> GetInfo(string sessionId)
+        public async Task<Result<AccountInfo>> GetInfo(string sessionId)
         {
             try
             {
-                var infoString = await client.GetInfo(sessionId);
-                return converter.ParseInfo(infoString);
+                var res = await client.GetInfo(sessionId);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<AccountInfo>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<AccountInfo>.Success(converter.ParseInfo(res));
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return null;
+                return Result<AccountInfo>.Failure(e);
             }
         }
 
-        public async Task<AccountMarks?> GetMarks(string sessionId)
+        public async Task<Result<AccountMarks>> GetMarks(string sessionId)
         {
             try
             {
-                var marksString = await client.GetMarks(sessionId);
-                return converter.ParseMarks(marksString);
+                var res = await client.GetMarks(sessionId);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<AccountMarks>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<AccountMarks>.Success(converter.ParseMarks(res));
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return null;
+                return Result<AccountMarks>.Failure(e);
             }
         }
 
-        public async Task<IList<AccountApplication>> GetApplications(string sessionId)
+        public async Task<Result<IList<AccountApplication>>> GetApplications(string sessionId)
         {
             try
             {
-                var applicationsString = await client.GetApplications(sessionId);
-                return converter.ParseApplications(applicationsString);
+                var res = await client.GetApplications(sessionId);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<IList<AccountApplication>>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<IList<AccountApplication>>.Success(converter.ParseApplications(res));
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return Array.Empty<AccountApplication>();
+                return Result<IList<AccountApplication>>.Failure(e);
             }
         }
 
-        public async Task<IList<AccountClassmate>> GetClassmates(string sessionId)
+        public async Task<Result<IList<AccountClassmate>>> GetClassmates(string sessionId)
         {
             try
             {
-                var classmateString = await client.GetClassmates(sessionId);
-                return converter.ParseClassmates(classmateString);
+                var res = await client.GetClassmates(sessionId);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<IList<AccountClassmate>>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<IList<AccountClassmate>>.Success(converter.ParseClassmates(res));
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return Array.Empty<AccountClassmate>();
+                return Result<IList<AccountClassmate>>.Failure(e);
             }
         }
 
-        public async Task<IList<AccountDialogPreview>> GetDialogs(string sessionId)
+        public async Task<Result<IList<AccountDialogPreview>>> GetDialogs(string sessionId)
         {
             try
             {
-                var dialogsString = await client.GetDialogs(sessionId);
-                return converter.ParseDialogs(dialogsString);
+                var res = await client.GetDialogs(sessionId);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<IList<AccountDialogPreview>>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<IList<AccountDialogPreview>>.Success(converter.ParseDialogs(res));
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return Array.Empty<AccountDialogPreview>();
+                return Result<IList<AccountDialogPreview>>.Failure(e);
             }
         }
 
-        public async Task<IList<AccountMessage>> GetDialog(string sessionId, string dialogKey)
+        public async Task<Result<IList<AccountMessage>>> GetDialog(string sessionId, string dialogKey)
         {
             try
             {
-                var dialogString = await client.GetDialog(sessionId, dialogKey);
-                return converter.ParseDialog(dialogString);
+                var res = await client.GetDialog(sessionId, dialogKey);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<IList<AccountMessage>>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<IList<AccountMessage>>.Success(converter.ParseDialog(res));
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return Array.Empty<AccountMessage>();
+                return Result<IList<AccountMessage>>.Failure(e);
             }
         }
     }
