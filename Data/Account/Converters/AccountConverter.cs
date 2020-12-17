@@ -3,6 +3,7 @@ using Mospolyhelper.Domain.Account.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Web;
@@ -510,7 +511,7 @@ namespace Mospolyhelper.Data.Account.Converters
                 ).FirstOrDefault()?.GetAttributeValue("value", 0) == 1;
             
             return new MyPortfolio(
-                otherInfo,
+                Encoding.UTF8.GetString(Convert.FromBase64String(otherInfo)),
                 otherInfoIsPublic
                 );
         }
