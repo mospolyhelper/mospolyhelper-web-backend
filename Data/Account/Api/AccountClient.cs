@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web;
@@ -70,9 +71,17 @@ namespace Mospolyhelper.Data.Account.Api
             {
                 RequestUri = url,
                 Method = method,
-                Headers = { { "Cookie", $"PHPSESSID={sessionId}" } },
                 Content = content
             };
+            var headers = new Dictionary<string, string>();
+            if (sessionId != string.Empty)
+            {
+                headers["Cookie"] = $"PHPSESSID={sessionId}";
+            }
+            foreach (var (key, value) in headers)
+            {
+                request.Headers.Add(key, value);
+            }
             return client.SendAsync(request);
         }
 
@@ -196,14 +205,14 @@ namespace Mospolyhelper.Data.Account.Api
 
         public Task<string> SetMyPortfolio(string sessionId, string otherInfo, bool isPublic)
         {
-            var formContent = new FormUrlEncodedContent(new[]
+            var content = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("otherinfo", Convert.ToBase64String(Encoding.UTF8.GetBytes(otherInfo))),
                 new KeyValuePair<string, string>("acces_otherinfo", isPublic ? "1" : "0"),
                 new KeyValuePair<string, string>("action", "save_portfolio")
             });
 
-            return GetResponseString(new Uri(UrlMyPortfolio), HttpMethod.Post, sessionId, formContent);
+            return GetResponseString(new Uri(UrlMyPortfolio), HttpMethod.Post, sessionId, content);
         }
     }
 }
