@@ -57,27 +57,39 @@ namespace Mospolyhelper.Data.Account.Api
             this.client = client;
         }
 
+        private async Task<string> GetResponseString(Uri url, HttpMethod method, string sessionId = "", HttpContent? content = null)
+        {
+            var response = await GetResponse(url, method, sessionId, content);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        private Task<HttpResponseMessage> GetResponse(Uri url, HttpMethod method, string sessionId = "", HttpContent? content = null)
+        {
+            var request = new HttpRequestMessage
+            {
+                RequestUri = url,
+                Method = method,
+                Headers = { { "Cookie", $"PHPSESSID={sessionId}" } },
+                Content = content
+            };
+            return client.SendAsync(request);
+        }
+
         public async Task<(bool, string?)> GetSessionId(string login, string password, string? sessionId = null)
         {
-            var content = new[]
+            var content = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("ulogin", login),
                 new KeyValuePair<string, string>("upassword", password),
                 new KeyValuePair<string, string>("auth_action", "userlogin")
-            };
-            var request = new HttpRequestMessage
-            {
-                RequestUri = new Uri(UrlAuth),
-                Method = HttpMethod.Post,
-                Content = new FormUrlEncodedContent(content),
-                Headers = { { "Cookie", sessionId ?? string.Empty } }
-            };
+            });
 
-            var response = await client.SendAsync(request);
+            var response = await GetResponse(new Uri(UrlAuth), HttpMethod.Post, sessionId ?? string.Empty, content);
             response.EnsureSuccessStatusCode();
-            var res = await response.Content.ReadAsStringAsync();
+            var resString = await response.Content.ReadAsStringAsync();
             var resSessionId = GetCookie(response) ?? string.Empty;
-            if (res.Contains("upassword"))
+            if (resString.Contains("upassword"))
             {
                 return (false, resSessionId);
             }
@@ -103,23 +115,9 @@ namespace Mospolyhelper.Data.Account.Api
             }
         }
 
-        private async Task<string> GetResponse(Uri url, HttpMethod method, string sessionId = "", HttpContent? content = null)
-        {
-            var request = new HttpRequestMessage
-            {
-                RequestUri = url,
-                Method = method,
-                Headers = { { "Cookie", $"PHPSESSID={sessionId}" } },
-                Content = content
-            };
-            var response = await client.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-            return await response.Content.ReadAsStringAsync();
-        }
-
         public Task<string> GetInfo(string sessionId)
         {
-            return GetResponse(new Uri(UrlInfo), HttpMethod.Get, sessionId);
+            return GetResponseString(new Uri(UrlInfo), HttpMethod.Get, sessionId);
         }
 
         public Task<string> GetPortfolio(string searchQuery, int page)
@@ -136,7 +134,7 @@ namespace Mospolyhelper.Data.Account.Api
             }
             builder.Query = query.ToWindows1251UrlEncodedQuery();
             var url = builder.Uri;
-            return GetResponse(url, HttpMethod.Get);
+            return GetResponseString(url, HttpMethod.Get);
         }
 
         public Task<string> GetTeachers(string sessionId, string searchQuery, int page)
@@ -153,27 +151,27 @@ namespace Mospolyhelper.Data.Account.Api
             }
             builder.Query = query.ToWindows1251UrlEncodedQuery();
             var url = builder.Uri;
-            return GetResponse(url, HttpMethod.Get, sessionId);
+            return GetResponseString(url, HttpMethod.Get, sessionId);
         }
 
         public Task<string> GetMarks(string sessionId)
         {
-            return GetResponse(new Uri(UrlMarks), HttpMethod.Get, sessionId);
+            return GetResponseString(new Uri(UrlMarks), HttpMethod.Get, sessionId);
         }
 
         public Task<string> GetApplications(string sessionId)
         {
-            return GetResponse(new Uri(UrlApplications), HttpMethod.Get, sessionId);
+            return GetResponseString(new Uri(UrlApplications), HttpMethod.Get, sessionId);
         }
 
         public Task<string> GetClassmates(string sessionId)
         {
-            return GetResponse(new Uri(UrlClassmates), HttpMethod.Get, sessionId);
+            return GetResponseString(new Uri(UrlClassmates), HttpMethod.Get, sessionId);
         }
 
         public Task<string> GetDialogs(string sessionId)
         {
-            return GetResponse(new Uri(UrlMessages), HttpMethod.Get, sessionId);
+            return GetResponseString(new Uri(UrlMessages), HttpMethod.Get, sessionId);
         }
 
         public Task<string> GetDialog(string sessionId, string dialogKey)
@@ -183,7 +181,7 @@ namespace Mospolyhelper.Data.Account.Api
             query["dlg"] = dialogKey;
             builder.Query = query.ToString();
             var url = builder.Uri;
-            return GetResponse(url, HttpMethod.Get, sessionId);
+            return GetResponseString(url, HttpMethod.Get, sessionId);
         }
 
         public void SendMessage(string sessionId, string dialogKey, string message)
@@ -193,19 +191,19 @@ namespace Mospolyhelper.Data.Account.Api
 
         public Task<string> GetMyPortfolio(string sessionId)
         {
-            return GetResponse(new Uri(UrlMyPortfolio), HttpMethod.Get, sessionId);
+            return GetResponseString(new Uri(UrlMyPortfolio), HttpMethod.Get, sessionId);
         }
 
         public Task<string> SetMyPortfolio(string sessionId, string otherInfo, bool isPublic)
         {
             var formContent = new FormUrlEncodedContent(new[]
             {
-                new KeyValuePair<string, string>("otherinfo", otherInfo),
+                new KeyValuePair<string, string>("otherinfo", Convert.ToBase64String(Encoding.UTF8.GetBytes(otherInfo))),
                 new KeyValuePair<string, string>("acces_otherinfo", isPublic ? "1" : "0"),
                 new KeyValuePair<string, string>("action", "save_portfolio")
             });
 
-            return GetResponse(new Uri(UrlMyPortfolio), HttpMethod.Post, sessionId, formContent);
+            return GetResponseString(new Uri(UrlMyPortfolio), HttpMethod.Post, sessionId, formContent);
         }
     }
 }

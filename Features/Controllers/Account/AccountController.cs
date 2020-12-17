@@ -287,7 +287,7 @@ namespace Mospolyhelper.Features.Controllers.Account
         public class MyPortfolio
         {
             public string OtherInformation { get; set; } = string.Empty;
-            public bool IsPublic { get; set; }
+            public bool IsPublic { get; set; } = false;
         }
     }
 }
