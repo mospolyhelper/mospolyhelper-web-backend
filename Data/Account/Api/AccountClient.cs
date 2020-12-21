@@ -87,12 +87,26 @@ namespace Mospolyhelper.Data.Account.Api
 
         public async Task<(bool, string?)> GetSessionId(string login, string password, string? sessionId = null)
         {
-            var content = new FormUrlEncodedContent(new[]
+            var q = new NameValueCollection()
             {
-                new KeyValuePair<string, string>("ulogin", login),
-                new KeyValuePair<string, string>("upassword", password),
-                new KeyValuePair<string, string>("auth_action", "userlogin")
-            });
+                { "ulogin", login },
+                 { "upassword", password },
+                 { "auth_action", "userlogin" }
+            };
+            var postData = q.ToWindows1251UrlEncodedQuery();
+            //string postData = HttpUtility.UrlEncode(
+            //    $"ulogin={login}&upassword={password}&auth_action=userlogin", Encoding.GetEncoding(1251)
+            //    );
+            byte[] data = Encoding.GetEncoding(1251).GetBytes(postData);
+            ByteArrayContent content = new ByteArrayContent(data);
+            content.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+
+            //var content = new FormUrlEncodedContent(new[]
+            //{
+            //    new KeyValuePair<string, string>("ulogin", login),
+            //    new KeyValuePair<string, string>("upassword", password),
+            //    new KeyValuePair<string, string>("auth_action", "userlogin")
+            //});
 
             var response = await GetResponse(new Uri(UrlAuth), HttpMethod.Post, sessionId ?? string.Empty, content);
             response.EnsureSuccessStatusCode();
@@ -100,6 +114,7 @@ namespace Mospolyhelper.Data.Account.Api
             var resSessionId = GetCookie(response) ?? string.Empty;
             if (resString.Contains("upassword"))
             {
+                Console.WriteLine("Ответ на авторизацию содержит upassword");
                 return (false, resSessionId);
             }
             return (true, resSessionId);
