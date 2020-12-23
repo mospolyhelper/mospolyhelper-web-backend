@@ -22,7 +22,7 @@ namespace Mospolyhelper.Features.Controllers.Map
         [HttpGet("map")]
         public async Task<ActionResult<Domain.Map.Model.Map>> Get()
         {
-            return Content(await useCase.GetMap());
+            return Content(await useCase.GetMap(), "application/json");
         }
     }
 }
