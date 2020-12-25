@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Mospolyhelper.Domain.Account.Model
 {
-    public class AccountDialogPreview
+    public class DialogPreview
     {
-        public AccountDialogPreview(int id, string dialogKey, string authorName, 
+        public DialogPreview(int id, string dialogKey, string authorName, 
             string authorGroup, string avatarUrl, string message, string date, bool hasAttachments, bool hasRead)
         {
             Id = id;

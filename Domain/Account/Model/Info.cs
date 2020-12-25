@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Mospolyhelper.Domain.Account.Model
 {
-    public class AccountInfo
+    public class Info
     {
-        public AccountInfo(
+        public Info(
             string name, 
             string status, 
             string sex, 

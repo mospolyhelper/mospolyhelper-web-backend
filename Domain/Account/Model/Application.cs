@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Mospolyhelper.Domain.Account.Model
 {
-    public class AccountApplication
+    public class Application
     {
-        public AccountApplication(
+        public Application(
             string registrationNumber, 
             string name, string dateTime, 
             string status, string department, 

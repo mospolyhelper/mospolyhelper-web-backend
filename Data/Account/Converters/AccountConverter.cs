@@ -12,7 +12,7 @@ namespace Mospolyhelper.Data.Account.Converters
 {
     public class AccountConverter
     {
-        public AccountStudents ParsePortfolios(string portfolios, int page)
+        public Students ParsePortfolios(string portfolios, int page)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml(portfolios);
@@ -39,14 +39,14 @@ namespace Mospolyhelper.Data.Account.Converters
                 ).Select(it => ParsePortfolio(it.Descendants("div")))
                 .ToList();
 
-            return new AccountStudents(
+            return new Students(
                 maxPage,
                 page,
                 portfolioList
                 );
         }
 
-        private AccountPortfolio ParsePortfolio(IEnumerable<HtmlNode> portfolio)
+        private Portfolio ParsePortfolio(IEnumerable<HtmlNode> portfolio)
         {
             var id = int.Parse(
                 portfolio.FirstOrDefault()?
@@ -67,7 +67,7 @@ namespace Mospolyhelper.Data.Account.Converters
             var educationForm = new Regex("Форма обучения: <b>(.+?)<\\/b><br")
                 .Match(body).Groups[1].Value;
 
-            return new AccountPortfolio(
+            return new Portfolio(
                 id,
                 name,
                 group,
@@ -152,8 +152,49 @@ namespace Mospolyhelper.Data.Account.Converters
                         );
         }
 
+        private readonly Dictionary<string, string> urlDict = new Dictionary<string, string> 
+        { 
+            { "?", "info" },
+            { "?p=about", "" },
+            { "?p=alerts", "" },
+            { "?p=messages", "dialogs" },
+            { "?p=payments", "" },
+            { "?p=rasp", "" },
+            { "?p=marks", "marks" },
+            { "?p=stud_stats", "" },
+            { "?p=projects", "" },
+            { "?p=phys", "" },
+            { "?p=group", "classmates" },
+            { "?p=teachers", "teachers" },
+            { "?p=sprav", "applications" },
+            { "?p=myportfolio", "myportfolio" },
+            { "?p=portfolio", "portfolios" },
+        };
 
-        public AccountInfo? ParseInfo(string info)
+        public IList<string> ParsePermissions(string permissions)
+        {
+            var doc = new HtmlDocument();
+            doc.LoadHtml(permissions);
+
+            var premissions = doc.DocumentNode.Descendants("ul")
+                .Where(it => it.GetAttributeValue("class", string.Empty) == "categories")
+                ?.FirstOrDefault()
+                ?.Descendants("li")
+                ?.Select(it => 
+                it.Descendants("a")
+                .FirstOrDefault()
+                ?.GetAttributeValue("href", null)
+                //?.Split("p=")
+                //?.LastOrDefault()
+                )
+                .Select(it => it != null && urlDict.ContainsKey(it) ? urlDict[it] : null)
+                .Where(it => !string.IsNullOrEmpty(it))
+                .ToList() as IList<string> ?? Array.Empty<string>();
+
+            return premissions;
+        }
+
+        public Info? ParseInfo(string info)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml(info);
@@ -215,7 +256,7 @@ namespace Mospolyhelper.Data.Account.Converters
                     .Select(it => htmlTagsClear.Replace(it.Groups[1].Value, string.Empty))
                     .ToList();
 
-                return new AccountInfo(
+                return new Info(
                     name,
                     status,
                     sex,
@@ -284,16 +325,16 @@ namespace Mospolyhelper.Data.Account.Converters
             return new AccountMarks(tempListOfList);
         }
 
-        public IList<AccountApplication> ParseApplications(string application)
+        public IList<Application> ParseApplications(string application)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml(application);
             var table = doc.DocumentNode.Descendants("table").LastOrDefault();
             if (table == null)
             {
-                return Array.Empty<AccountApplication>();
+                return Array.Empty<Application>();
             }
-            var resList = new List<AccountApplication>();
+            var resList = new List<Application>();
             var trs = table.Descendants("tr").Skip(1);
             foreach (var tr in trs)
             {
@@ -312,7 +353,7 @@ namespace Mospolyhelper.Data.Account.Converters
                 tds.MoveNext();
                 var note = tds.Current.InnerHtml;
                 resList.Add(
-                    new AccountApplication(
+                    new Application(
                         regNumber,
                         name,
                         dateTime,
@@ -326,16 +367,16 @@ namespace Mospolyhelper.Data.Account.Converters
             return resList;
         }
 
-        public IList<AccountClassmate> ParseClassmates(string classmates)
+        public IList<Classmate> ParseClassmates(string classmates)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml(classmates);
             var table = doc.DocumentNode.Descendants("table").LastOrDefault();
             if (table == null)
             {
-                return Array.Empty<AccountClassmate>();
+                return Array.Empty<Classmate>();
             }
-            var resList = new List<AccountClassmate>();
+            var resList = new List<Classmate>();
             var trs = table.Descendants("tr");
             foreach (var tr in trs)
             {
@@ -362,7 +403,7 @@ namespace Mospolyhelper.Data.Account.Converters
                     ?.LastOrDefault() ?? string.Empty;
                 messageKey = HttpUtility.UrlDecode(messageKey);
                 resList.Add(
-                    new AccountClassmate(
+                    new Classmate(
                         id,
                         name,
                         imageUrl,
@@ -374,16 +415,16 @@ namespace Mospolyhelper.Data.Account.Converters
             return resList;
         }
 
-        public IList<AccountDialogPreview> ParseDialogs(string messages)
+        public IList<DialogPreview> ParseDialogs(string messages)
         {
             var doc = new HtmlDocument();
             doc.LoadHtml(messages);
             var table = doc.DocumentNode.Descendants("table").LastOrDefault();
             if (table == null)
             {
-                return Array.Empty<AccountDialogPreview>();
+                return Array.Empty<DialogPreview>();
             }
-            var resList = new List<AccountDialogPreview>();
+            var resList = new List<DialogPreview>();
             var trs = table.Descendants("tr");
             foreach (var tr in trs)
             {
@@ -416,7 +457,7 @@ namespace Mospolyhelper.Data.Account.Converters
                 tds.MoveNext();
                 var hasRead = tds.Current.InnerHtml.Contains("нов", StringComparison.InvariantCultureIgnoreCase);
                 resList.Add(
-                    new AccountDialogPreview(
+                    new DialogPreview(
                         id,
                         messageKey,
                         authorName,
@@ -466,12 +507,17 @@ namespace Mospolyhelper.Data.Account.Converters
                 {
                     message = message.Substring(0, index);
                 }
-                var attachmentUrl = tds.Current.Descendants("div").FirstOrDefault()
+                var attachments = tds.Current.Descendants("div").FirstOrDefault()
                     ?.Descendants("div").FirstOrDefault()
-                    ?.Descendants("a").FirstOrDefault()
-                    ?.GetAttributeValue("href", null)
-                    ?.Split("f=")?.LastOrDefault();
-                attachmentUrl = HttpUtility.UrlDecode(attachmentUrl);
+                    ?.Descendants("a")
+                    ?.Select(it => 
+                    {
+                        var url = it.GetAttributeValue("href", null)?.Split("f=")?.LastOrDefault();
+                        url = HttpUtility.UrlDecode(url);
+                        var name = it.InnerText;
+                        return new AccountAttachment(url, name);
+                    })
+                    ?.ToList() as IList<AccountAttachment> ?? Array.Empty<AccountAttachment>();
                 tds.MoveNext();
                 var date = tds.Current.Descendants("font").FirstOrDefault()?.InnerText ?? string.Empty;
                 var removeUrl = tds.Current.Descendants("a").FirstOrDefault()
@@ -485,7 +531,7 @@ namespace Mospolyhelper.Data.Account.Converters
                         imageUrl,
                         authorName,
                         message,
-                        attachmentUrl,
+                        attachments,
                         removeUrl
                         )
                     );
