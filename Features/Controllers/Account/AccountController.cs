@@ -38,7 +38,7 @@ namespace Mospolyhelper.Features.Controllers.Account
         public class MessageObj
         {
             public string Message { get; set; }
-            public IList<string> FileNames { get; set; }
+            public IList<string> FileNames { get; set; } = Array.Empty<string>();
         }
 
         [HttpPost("auth")]
