@@ -7,10 +7,13 @@ using Autofac;
 using Mospolyhelper.Data.Account.Api;
 using Mospolyhelper.Data.Account.Converters;
 using Mospolyhelper.Data.Account.Remote;
+using Mospolyhelper.Data.Account.Repository;
 using Mospolyhelper.Data.Schedule.Api;
 using Mospolyhelper.Data.Schedule.Converters;
 using Mospolyhelper.Data.Schedule.Remote;
 using Mospolyhelper.Data.Schedule.Repository;
+using Mospolyhelper.Domain.Account.Repository;
+using Mospolyhelper.Domain.Account.UseCase;
 using Mospolyhelper.Domain.Schedule.Repository;
 using Mospolyhelper.Domain.Schedule.UseCase;
 
@@ -47,24 +50,17 @@ namespace Mospolyhelper.DI
 
 
             // Repositories
-            //builder
-            //    .Register(c => new ScheduleRepository(c.Resolve<ScheduleRemoteDataSource>()))
-            //    .As<IScheduleRepository>()
-            //    .SingleInstance();
+            builder
+                .Register(c => new AccountRepository(c.Resolve<AccountRemoteDataSource>()))
+                .As<IAccountRepository>()
+                .SingleInstance();
 
 
             // UseCases
-            //builder
-            //    .Register(c => new ScheduleUseCase(c.Resolve<IScheduleRepository>()))
-            //    .As<ScheduleUseCase>()
-            //    .SingleInstance();
-
-
-            //// Controllers
-            //builder
-            //    .Register(c => new ScheduleController(c.Resolve<ScheduleUseCase>()))
-            //    .As<ScheduleController>()
-            //    .InstancePerRequest();
+            builder
+                .Register(c => new AccountUseCase(c.Resolve<IAccountRepository>()))
+                .As<AccountUseCase>()
+                .SingleInstance();
         }
     }
 }

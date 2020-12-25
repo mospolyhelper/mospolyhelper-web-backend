@@ -11,8 +11,8 @@
             int id, 
             string avatarUrl, 
             string authorName, 
-            string message, 
-            string? attachmentUrl, 
+            string message,
+            IList<AccountAttachment> attachments, 
             string removeUrl
             )
         {
@@ -20,7 +20,7 @@
             AvatarUrl = avatarUrl;
             AuthorName = authorName;
             Message = message;
-            AttachmentUrl = attachmentUrl;
+            Attachments = attachments;
             RemoveUrl = removeUrl;
         }
 
@@ -28,7 +28,7 @@
         public string AvatarUrl { get; }
         public string AuthorName { get; }
         public string Message { get; }
-        public string? AttachmentUrl { get; }
+        public IList<AccountAttachment> Attachments { get; }
         public string RemoveUrl { get; }
     }
 }

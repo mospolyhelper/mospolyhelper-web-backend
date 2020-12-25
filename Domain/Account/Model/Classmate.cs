@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Mospolyhelper.Domain.Account.Model
 {
-    public class AccountClassmate
+    public class Classmate
     {
-        public AccountClassmate(int id, string name, string avatarUrl, string status, string dialogKey)
+        public Classmate(int id, string name, string avatarUrl, string status, string dialogKey)
         {
             Id = id;
             Name = name;

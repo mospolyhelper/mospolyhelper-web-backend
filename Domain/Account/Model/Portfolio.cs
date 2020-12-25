@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 
 namespace Mospolyhelper.Domain.Account.Model
 {
-    public class AccountPortfolio
+    public class Portfolio
     {
-        public AccountPortfolio(
+        public Portfolio(
             int id,
             string name, 
             string group, 

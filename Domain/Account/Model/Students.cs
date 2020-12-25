@@ -2,9 +2,9 @@
 {
     using System.Collections.Generic;
 
-    public class AccountStudents
+    public class Students
     {
-        public AccountStudents(int pageCount, int currentPage, IList<AccountPortfolio> portfolios)
+        public Students(int pageCount, int currentPage, IList<Portfolio> portfolios)
         {
             PageCount = pageCount;
             CurrentPage = currentPage;
@@ -13,6 +13,6 @@
 
         public int PageCount { get; }
         public int CurrentPage { get; }
-        public IList<AccountPortfolio> Portfolios { get; }
+        public IList<Portfolio> Portfolios { get; }
     }
 }

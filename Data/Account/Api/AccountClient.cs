@@ -85,39 +85,28 @@ namespace Mospolyhelper.Data.Account.Api
             return client.SendAsync(request);
         }
 
-        public async Task<(bool, string?)> GetSessionId(string login, string password, string? sessionId = null)
+        public async Task<string> GetSessionId(string login, string password, string? sessionId = null)
         {
-            var q = new NameValueCollection()
+            var postData = new NameValueCollection()
             {
                 { "ulogin", login },
-                 { "upassword", password },
-                 { "auth_action", "userlogin" }
+                { "upassword", password },
+                { "auth_action", "userlogin" }
             };
-            var postData = q.ToWindows1251UrlEncodedQuery();
-            //string postData = HttpUtility.UrlEncode(
-            //    $"ulogin={login}&upassword={password}&auth_action=userlogin", Encoding.GetEncoding(1251)
-            //    );
-            byte[] data = Encoding.GetEncoding(1251).GetBytes(postData);
-            ByteArrayContent content = new ByteArrayContent(data);
+            var data = Encoding.GetEncoding(1251).GetBytes(postData.ToWindows1251UrlEncodedQuery());
+            var content = new ByteArrayContent(data);
             content.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
-
-            //var content = new FormUrlEncodedContent(new[]
-            //{
-            //    new KeyValuePair<string, string>("ulogin", login),
-            //    new KeyValuePair<string, string>("upassword", password),
-            //    new KeyValuePair<string, string>("auth_action", "userlogin")
-            //});
 
             var response = await GetResponse(new Uri(UrlAuth), HttpMethod.Post, sessionId ?? string.Empty, content);
             response.EnsureSuccessStatusCode();
             var resString = await response.Content.ReadAsStringAsync();
-            var resSessionId = GetCookie(response) ?? string.Empty;
+            var resSessionId = GetCookie(response) ?? sessionId ?? string.Empty;
             if (resString.Contains("upassword"))
             {
                 Console.WriteLine("Ответ на авторизацию содержит upassword");
-                return (false, resSessionId);
+                throw new UnauthorizedAccessException();
             }
-            return (true, resSessionId);
+            return resSessionId;
         }
 
         private string? GetCookie(HttpResponseMessage message)
@@ -137,6 +126,11 @@ namespace Mospolyhelper.Data.Account.Api
             {
                 return null;
             }
+        }
+
+        public Task<string> GetPermissions(string sessionId)
+        {
+            return GetResponseString(new Uri(UrlInfo), HttpMethod.Get, sessionId);
         }
 
         public Task<string> GetInfo(string sessionId)
@@ -208,9 +202,29 @@ namespace Mospolyhelper.Data.Account.Api
             return GetResponseString(url, HttpMethod.Get, sessionId);
         }
 
-        public void SendMessage(string sessionId, string dialogKey, string message)
+        public Task<string> SendMessage(string sessionId, string dialogKey, string message, IList<string> fileNames)
         {
+            var builder = new UriBuilder(UrlMessages);
+            var query = HttpUtility.ParseQueryString(builder.Query);
+            query["dlg"] = dialogKey;
+            builder.Query = query.ToString();
+            var url = builder.Uri;
 
+            var contentList = new NameValueCollection()
+            {
+                { "to", dialogKey },
+                { "action", "writeto" },
+                { "answer", message }
+            };
+            foreach (var fileName in fileNames)
+            {
+                contentList.Add("ufile[]", fileName);
+            }
+            var data = Encoding.GetEncoding(1251).GetBytes(contentList.ToWindows1251UrlEncodedQuery());
+            var content = new ByteArrayContent(data);
+            content.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+
+            return GetResponseString(url, HttpMethod.Post, sessionId, content);
         }
 
         public Task<string> GetMyPortfolio(string sessionId)

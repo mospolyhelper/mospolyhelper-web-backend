@@ -11,8 +11,8 @@ namespace Mospolyhelper.Data.Account.Remote
 {
     public class AccountRemoteDataSource
     {
-        private AccountClient client;
-        private AccountConverter converter;
+        private readonly AccountClient client;
+        private readonly AccountConverter converter;
 
         public AccountRemoteDataSource(AccountClient client, AccountConverter converter)
         {
@@ -25,30 +25,49 @@ namespace Mospolyhelper.Data.Account.Remote
             return !html.Contains("upassword");
         }
 
-        public async Task<(bool, string?)> GetSessionId(string login, string password, string? sessionId = null)
+        public async Task<Result<string>> GetSessionId(string login, string password, string? sessionId = null)
         {
             try
             {
-                return await client.GetSessionId(login, password, sessionId);
+                return Result<string>.Success(await client.GetSessionId(login, password, sessionId));
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return (false, null);
+                return Result<string>.Failure(e);
             }
         }
 
-        public async Task<AccountStudents> GetPortfolios(string searchQuery, int page)
+        public async Task<Result<IList<string>>> GetPermissions(string sessionId)
+        {
+            try
+            {
+                var res = await client.GetPermissions(sessionId);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<IList<string>>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<IList<string>>.Success(converter.ParsePermissions(res));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Result<IList<string>>.Failure(e);
+            }
+        }
+
+        public async Task<Result<Students>> GetPortfolios(string searchQuery, int page)
         {
             try
             {
                 var res = await client.GetPortfolio(searchQuery, page);
-                return converter.ParsePortfolios(res, page);
+                return Result<Students>.Success(converter.ParsePortfolios(res, page));
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return new AccountStudents(1, 1, Array.Empty<AccountPortfolio>());
+                return Result<Students>.Failure(e);
             }
         }
 
@@ -71,7 +90,7 @@ namespace Mospolyhelper.Data.Account.Remote
             }
         }
 
-        public async Task<Result<AccountInfo>> GetInfo(string sessionId)
+        public async Task<Result<Info>> GetInfo(string sessionId)
         {
             try
             {
@@ -79,14 +98,14 @@ namespace Mospolyhelper.Data.Account.Remote
                 var isAuthorized = CheckAuthorization(res);
                 if (!isAuthorized)
                 {
-                    return Result<AccountInfo>.Failure(new UnauthorizedAccessException());
+                    return Result<Info>.Failure(new UnauthorizedAccessException());
                 }
-                return Result<AccountInfo>.Success(converter.ParseInfo(res));
+                return Result<Info>.Success(converter.ParseInfo(res));
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return Result<AccountInfo>.Failure(e);
+                return Result<Info>.Failure(e);
             }
         }
 
@@ -109,7 +128,7 @@ namespace Mospolyhelper.Data.Account.Remote
             }
         }
 
-        public async Task<Result<IList<AccountApplication>>> GetApplications(string sessionId)
+        public async Task<Result<IList<Application>>> GetApplications(string sessionId)
         {
             try
             {
@@ -117,18 +136,18 @@ namespace Mospolyhelper.Data.Account.Remote
                 var isAuthorized = CheckAuthorization(res);
                 if (!isAuthorized)
                 {
-                    return Result<IList<AccountApplication>>.Failure(new UnauthorizedAccessException());
+                    return Result<IList<Application>>.Failure(new UnauthorizedAccessException());
                 }
-                return Result<IList<AccountApplication>>.Success(converter.ParseApplications(res));
+                return Result<IList<Application>>.Success(converter.ParseApplications(res));
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return Result<IList<AccountApplication>>.Failure(e);
+                return Result<IList<Application>>.Failure(e);
             }
         }
 
-        public async Task<Result<IList<AccountClassmate>>> GetClassmates(string sessionId)
+        public async Task<Result<IList<Classmate>>> GetClassmates(string sessionId)
         {
             try
             {
@@ -136,52 +155,14 @@ namespace Mospolyhelper.Data.Account.Remote
                 var isAuthorized = CheckAuthorization(res);
                 if (!isAuthorized)
                 {
-                    return Result<IList<AccountClassmate>>.Failure(new UnauthorizedAccessException());
+                    return Result<IList<Classmate>>.Failure(new UnauthorizedAccessException());
                 }
-                return Result<IList<AccountClassmate>>.Success(converter.ParseClassmates(res));
+                return Result<IList<Classmate>>.Success(converter.ParseClassmates(res));
             }
             catch (Exception e)
             {
                 Console.WriteLine(e);
-                return Result<IList<AccountClassmate>>.Failure(e);
-            }
-        }
-
-        public async Task<Result<IList<AccountDialogPreview>>> GetDialogs(string sessionId)
-        {
-            try
-            {
-                var res = await client.GetDialogs(sessionId);
-                var isAuthorized = CheckAuthorization(res);
-                if (!isAuthorized)
-                {
-                    return Result<IList<AccountDialogPreview>>.Failure(new UnauthorizedAccessException());
-                }
-                return Result<IList<AccountDialogPreview>>.Success(converter.ParseDialogs(res));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return Result<IList<AccountDialogPreview>>.Failure(e);
-            }
-        }
-
-        public async Task<Result<IList<AccountMessage>>> GetDialog(string sessionId, string dialogKey)
-        {
-            try
-            {
-                var res = await client.GetDialog(sessionId, dialogKey);
-                var isAuthorized = CheckAuthorization(res);
-                if (!isAuthorized)
-                {
-                    return Result<IList<AccountMessage>>.Failure(new UnauthorizedAccessException());
-                }
-                return Result<IList<AccountMessage>>.Success(converter.ParseDialog(res));
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                return Result<IList<AccountMessage>>.Failure(e);
+                return Result<IList<Classmate>>.Failure(e);
             }
         }
 
@@ -220,6 +201,68 @@ namespace Mospolyhelper.Data.Account.Remote
             {
                 Console.WriteLine(e);
                 return Result<MyPortfolio>.Failure(e);
+            }
+        }
+
+        public async Task<Result<IList<DialogPreview>>> GetDialogs(string sessionId)
+        {
+            try
+            {
+                var res = await client.GetDialogs(sessionId);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<IList<DialogPreview>>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<IList<DialogPreview>>.Success(converter.ParseDialogs(res));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Result<IList<DialogPreview>>.Failure(e);
+            }
+        }
+
+        public async Task<Result<IList<AccountMessage>>> GetDialog(string sessionId, string dialogKey)
+        {
+            try
+            {
+                var res = await client.GetDialog(sessionId, dialogKey);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<IList<AccountMessage>>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<IList<AccountMessage>>.Success(converter.ParseDialog(res));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Result<IList<AccountMessage>>.Failure(e);
+            }
+        }
+
+        public async Task<Result<IList<AccountMessage>>> SendMessage(
+            string sessionId,
+            string dialogKey,
+            string message,
+            IList<string> fileNames
+            )
+        {
+            try
+            {
+                var res = await this.client.SendMessage(sessionId, dialogKey, message, fileNames);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<IList<AccountMessage>>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<IList<AccountMessage>>.Success(converter.ParseDialog(res));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Result<IList<AccountMessage>>.Failure(e);
             }
         }
     }
