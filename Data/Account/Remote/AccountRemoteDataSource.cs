@@ -1,4 +1,5 @@
-﻿using Mospolyhelper.Data.Account.Api;
+﻿using Microsoft.Extensions.Logging;
+using Mospolyhelper.Data.Account.Api;
 using Mospolyhelper.Data.Account.Converters;
 using Mospolyhelper.Domain.Account.Model;
 using Mospolyhelper.Utils;
@@ -11,11 +12,17 @@ namespace Mospolyhelper.Data.Account.Remote
 {
     public class AccountRemoteDataSource
     {
+        private readonly ILogger logger;
         private readonly AccountClient client;
         private readonly AccountConverter converter;
 
-        public AccountRemoteDataSource(AccountClient client, AccountConverter converter)
+        public AccountRemoteDataSource(
+            ILogger<AccountRemoteDataSource> logger, 
+            AccountClient client, 
+            AccountConverter converter
+            )
         {
+            this.logger = logger;
             this.client = client;
             this.converter = converter;
         }

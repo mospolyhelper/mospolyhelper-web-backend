@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Data;
@@ -52,10 +53,12 @@ namespace Mospolyhelper.Data.Account.Api
         private const string UrlPortfolio = UrlBase + "/?p=portfolio";
 
         private readonly HttpClient client;
+        private readonly ILogger logger;
 
-        public AccountClient(HttpClient client)
+        public AccountClient(ILogger<AccountClient> logger, HttpClient client)
         {
             this.client = client;
+            this.logger = logger;
         }
 
         private async Task<string> GetResponseString(Uri url, HttpMethod method, string sessionId = "", HttpContent? content = null)

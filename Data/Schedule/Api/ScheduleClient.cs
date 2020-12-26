@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web;
+using Microsoft.Extensions.Logging;
 using Mospolyhelper.Utils;
 
 namespace Mospolyhelper.Data.Schedule.Api
@@ -16,10 +17,12 @@ namespace Mospolyhelper.Data.Schedule.Api
         private readonly string UrlGetAllSchedulesSession = 
             UrlBase + Secrets.URL_SCHEDULE_SESSION_ALL;
 
+        private readonly ILogger logger;
         private readonly HttpClient client;
 
-        public ScheduleClient(HttpClient client)
+        public ScheduleClient(ILogger<ScheduleClient> logger, HttpClient client)
         {
+            this.logger = logger;
             this.client = client;
         }
 

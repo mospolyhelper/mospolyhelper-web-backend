@@ -2,6 +2,7 @@
 using System.Collections.Immutable;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Mospolyhelper.Data.Schedule.Repository;
 using Mospolyhelper.Domain.Schedule.Model;
 using Mospolyhelper.Domain.Schedule.Repository;
@@ -10,10 +11,15 @@ namespace Mospolyhelper.Domain.Schedule.UseCase
 {
     public class ScheduleUseCase
     {
-        private IScheduleRepository scheduleRepository;
+        private readonly ILogger logger;
+        private readonly IScheduleRepository scheduleRepository;
 
-        public ScheduleUseCase(IScheduleRepository scheduleRepository)
+        public ScheduleUseCase(
+            ILogger<ScheduleUseCase> logger,
+            IScheduleRepository scheduleRepository
+            )
         {
+            this.logger = logger;
             this.scheduleRepository = scheduleRepository;
         }
 

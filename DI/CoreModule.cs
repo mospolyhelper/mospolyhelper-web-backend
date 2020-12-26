@@ -1,16 +1,16 @@
-﻿using System.Net.Http;
-using Autofac;
-
-namespace Mospolyhelper.DI
+﻿namespace Mospolyhelper.DI
 {
-    public class CoreModule : Module
+    using Microsoft.Extensions.DependencyInjection;
+    using Mospolyhelper.DI.Common;
+    using System.Net.Http;
+
+    public class CoreModule : IModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public void Load(IServiceCollection services)
         {
-            builder
-                .Register(c => new HttpClient(new HttpClientHandler { UseCookies = false }))
-                .As<HttpClient>()
-                .SingleInstance();
+            services.AddSingleton<HttpClient>(it => 
+                new HttpClient(new HttpClientHandler { UseCookies = false })
+            );
         }
     }
 }

@@ -1,69 +1,38 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Text;
-using Autofac;
-using Mospolyhelper.Data.Schedule.Api;
-using Mospolyhelper.Data.Schedule.Converters;
-using Mospolyhelper.Data.Schedule.Local;
-using Mospolyhelper.Data.Schedule.Remote;
-using Mospolyhelper.Data.Schedule.Repository;
-using Mospolyhelper.Domain.Schedule.Repository;
-using Mospolyhelper.Domain.Schedule.UseCase;
-using Mospolyhelper.Features.Controllers.Schedule;
-
-namespace Mospolyhelper.DI
+﻿namespace Mospolyhelper.DI
 {
-    class ScheduleModule : Module
+    using Microsoft.Extensions.DependencyInjection;
+    using Mospolyhelper.Data.Schedule.Api;
+    using Mospolyhelper.Data.Schedule.Converters;
+    using Mospolyhelper.Data.Schedule.Local;
+    using Mospolyhelper.Data.Schedule.Remote;
+    using Mospolyhelper.Data.Schedule.Repository;
+    using Mospolyhelper.DI.Common;
+    using Mospolyhelper.Domain.Schedule.Repository;
+    using Mospolyhelper.Domain.Schedule.UseCase;
+
+    class ScheduleModule : IModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public void Load(IServiceCollection services)
         {
             // Apis
-            builder
-                .Register(c => new ScheduleClient(c.Resolve<HttpClient>()))
-                .As<ScheduleClient>()
-                .SingleInstance();
+            services.AddSingleton<ScheduleClient>();
 
 
             // Converters
-            builder
-                .Register(c => new ScheduleRemoteConverter())
-                .As<ScheduleRemoteConverter>()
-                .SingleInstance();
+            services.AddSingleton<ScheduleRemoteConverter>();
 
 
             // DataSources
-            builder
-                .Register(c => 
-                    new ScheduleRemoteDataSource(
-                        c.Resolve<ScheduleClient>(), 
-                        c.Resolve<ScheduleRemoteConverter>()
-                        )
-                )
-                .As<ScheduleRemoteDataSource>()
-                .SingleInstance();
-
-            builder
-                .Register(c => new ScheduleLocalDataSource())
-                .As<ScheduleLocalDataSource>()
-                .SingleInstance();
+            services.AddSingleton<ScheduleRemoteDataSource>();
+            services.AddSingleton<ScheduleLocalDataSource>();
 
 
             // Repositories
-            builder
-                .Register(c => new ScheduleRepository(
-                    c.Resolve<ScheduleRemoteDataSource>(),
-                    c.Resolve<ScheduleLocalDataSource>()
-                    ))
-                .As<IScheduleRepository>()
-                .SingleInstance();
+            services.AddSingleton<IScheduleRepository, ScheduleRepository>();
 
 
             // UseCases
-            builder
-                .Register(c => new ScheduleUseCase(c.Resolve<IScheduleRepository>()))
-                .As<ScheduleUseCase>()
-                .SingleInstance();
+            services.AddSingleton<ScheduleUseCase>();
         }
     }
 }

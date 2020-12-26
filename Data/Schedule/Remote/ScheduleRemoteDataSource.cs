@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Mospolyhelper.Data.Schedule.Api;
 using Mospolyhelper.Data.Schedule.Converters;
 
@@ -8,11 +9,17 @@ namespace Mospolyhelper.Data.Schedule.Remote
 {
     public class ScheduleRemoteDataSource
     {
+        private readonly ILogger logger;
         private readonly ScheduleClient client;
         private readonly ScheduleRemoteConverter converter;
 
-        public ScheduleRemoteDataSource(ScheduleClient client, ScheduleRemoteConverter converter)
+        public ScheduleRemoteDataSource(
+            ILogger<ScheduleRemoteDataSource> logger,
+            ScheduleClient client, 
+            ScheduleRemoteConverter converter
+            )
         {
+            this.logger = logger;
             this.client = client;
             this.converter = converter;
         }

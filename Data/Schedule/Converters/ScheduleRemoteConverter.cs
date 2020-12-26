@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text.Json;
+using Microsoft.Extensions.Logging;
 using Mospolyhelper.Domain.Schedule.Model;
 
 namespace Mospolyhelper.Data.Schedule.Converters
@@ -45,6 +46,13 @@ namespace Mospolyhelper.Data.Schedule.Converters
         private const string DateFormat = "yyyy-MM-dd";
 
         #endregion
+
+        private readonly ILogger logger;
+
+        public ScheduleRemoteConverter(ILogger<ScheduleRemoteConverter> logger)
+        {
+            this.logger = logger;
+        }
 
         public IList<Domain.Schedule.Model.Schedule> ParseSchedules(string schedulesString)
         {
