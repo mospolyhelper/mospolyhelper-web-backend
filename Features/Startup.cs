@@ -8,7 +8,6 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Autofac;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -22,6 +21,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.OpenApi.Models;
 using Mospolyhelper.DI;
+using Mospolyhelper.DI.Common;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Mospolyhelper
@@ -48,7 +48,7 @@ namespace Mospolyhelper
         {
             services.AddCors(o => o.AddPolicy("MyPolicy", builder =>
             {
-                builder//.WithOrigins("http://localhost:1427", "https://mospolyhelper.github.io", "https://mospolyhelper.github.io/schedule")
+                builder//.WithOrigins("https://mospolyhelper.github.io")
                         .AllowAnyOrigin()
                        .AllowAnyMethod()
                        //.AllowCredentials()
@@ -94,6 +94,12 @@ namespace Mospolyhelper
             //    })
             //    .Services
             //    .AddHttpClient();
+
+            services
+                .RegisterModule(new CoreModule())
+                .RegisterModule(new ScheduleModule())
+                .RegisterModule(new AccountModule())
+                .RegisterModule(new MapModule());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -139,18 +145,6 @@ namespace Mospolyhelper
 
             //TODO: Move this:
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-        }
-
-        // ConfigureContainer is where you can register things directly
-        // with Autofac. This runs after ConfigureServices so the things
-        // here will override registrations made in ConfigureServices.
-        // Don't build the container; that gets done for you by the factory.
-        public void ConfigureContainer(ContainerBuilder builder)
-        {
-            builder.RegisterModule(new CoreModule());
-            builder.RegisterModule(new ScheduleModule());
-            builder.RegisterModule(new AccountModule());
-            builder.RegisterModule(new MapModule());
         }
     }
 }

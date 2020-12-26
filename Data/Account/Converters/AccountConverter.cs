@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using Microsoft.Extensions.Logging;
 using Mospolyhelper.Domain.Account.Model;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,13 @@ namespace Mospolyhelper.Data.Account.Converters
 {
     public class AccountConverter
     {
+        private readonly ILogger logger;
+
+        public AccountConverter(ILogger<AccountConverter> logger)
+        {
+            this.logger = logger;
+        }
+
         public Students ParsePortfolios(string portfolios, int page)
         {
             var doc = new HtmlDocument();

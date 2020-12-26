@@ -1,5 +1,6 @@
 ﻿namespace Mospolyhelper.Data.Account.Repository
 {
+    using Microsoft.Extensions.Logging;
     using Mospolyhelper.Data.Account.Remote;
     using Mospolyhelper.Domain.Account.Model;
     using Mospolyhelper.Domain.Account.Repository;
@@ -11,10 +12,15 @@
 
     public class AccountRepository : IAccountRepository
     {
+        private readonly ILogger logger;
         private readonly AccountRemoteDataSource remoteDataSource;
 
-        public AccountRepository(AccountRemoteDataSource remoteDataSource)
+        public AccountRepository(
+            ILogger<AccountRepository> logger, 
+            AccountRemoteDataSource remoteDataSource
+            )
         {
+            this.logger = logger;
             this.remoteDataSource = remoteDataSource;
         }
 

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Mospolyhelper.Data.Schedule.Local;
 using Mospolyhelper.Data.Schedule.Remote;
 using Mospolyhelper.Domain.Schedule.Model;
@@ -10,14 +11,17 @@ namespace Mospolyhelper.Data.Schedule.Repository
 {
     public class ScheduleRepository : IScheduleRepository
     {
+        private readonly ILogger logger;
         private readonly ScheduleRemoteDataSource remoteDataSource;
         private readonly ScheduleLocalDataSource localDataSource;
 
         public ScheduleRepository(
+            ILogger<ScheduleRepository> logger,
             ScheduleRemoteDataSource remoteDataSource,
             ScheduleLocalDataSource localDataSource
             )
         {
+            this.logger = logger;
             this.remoteDataSource = remoteDataSource;
             this.localDataSource = localDataSource;
         }

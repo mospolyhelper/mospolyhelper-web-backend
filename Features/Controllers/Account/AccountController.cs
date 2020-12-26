@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Mospolyhelper.Data.Account.Api;
 using Mospolyhelper.Data.Account.Remote;
 using Mospolyhelper.Domain.Account.Model;
@@ -15,27 +16,32 @@ namespace Mospolyhelper.Features.Controllers.Account
     [Produces("application/json")]
     public class AccountController : ControllerBase
     {
+        private readonly ILogger logger;
         private readonly AccountUseCase useCase;
 
-        public AccountController(AccountUseCase useCase)
+        public AccountController(
+            ILogger<AccountController> logger, 
+            AccountUseCase useCase
+            )
         {
+            this.logger = logger;
             this.useCase = useCase;
         }
 
-        public class AuthObj
+        public class AuthQuery
         {
             public string Login { get; set; }
             public string Password { get; set; }
             public string SessionId { get; set; } = string.Empty;
         }
 
-        public class MyPortfolio
+        public class MyPortfolioQuery
         {
             public string OtherInformation { get; set; } = string.Empty;
             public bool IsPublic { get; set; } = false;
         }
 
-        public class MessageObj
+        public class MessageQuery
         {
             public string Message { get; set; }
             public IList<string> FileNames { get; set; } = Array.Empty<string>();
@@ -43,9 +49,10 @@ namespace Mospolyhelper.Features.Controllers.Account
 
         [HttpPost("auth")]
         public async Task<ActionResult<string>> GetSessionId(
-            [FromBody] AuthObj authObj
+            [FromBody] AuthQuery authObj
             )
         {
+            this.logger.LogInformation("POST request /account/auth");
             var res = await useCase.GetSessionId(authObj.Login, authObj.Password, authObj.SessionId);
             if (res.IsSuccess)
             {
@@ -62,11 +69,12 @@ namespace Mospolyhelper.Features.Controllers.Account
             return StatusCode(500);
         }
 
-        [HttpPost("permissions")]
+        [HttpGet("permissions")]
         public async Task<ActionResult<string>> GetPermissions(
             [FromHeader] string? sessionId = ""
             )
         {
+            this.logger.LogInformation("POST request /account/permissions");
             if (string.IsNullOrEmpty(sessionId))
             {
                 return Unauthorized();
@@ -93,6 +101,7 @@ namespace Mospolyhelper.Features.Controllers.Account
             [FromQuery] int page = 1
             )
         {
+            this.logger.LogInformation($"GET request /account/portfolios query = {searchQuery}; page = {page}");
             var res = await useCase.GetPortfolios(searchQuery ?? string.Empty, page);
             if (res.IsSuccess)
             {
@@ -112,6 +121,7 @@ namespace Mospolyhelper.Features.Controllers.Account
             [FromHeader] string? sessionId = ""
             )
         {
+            this.logger.LogInformation($"GET request /account/teachers query = {searchQuery}; page = {page}");
             if (string.IsNullOrEmpty(sessionId))
             {
                 return Unauthorized();
@@ -137,6 +147,7 @@ namespace Mospolyhelper.Features.Controllers.Account
             [FromHeader] string? sessionId = ""
             )
         {
+            this.logger.LogInformation("GET request /account/classmates");
             if (string.IsNullOrEmpty(sessionId))
             {
                 return Unauthorized();
@@ -162,6 +173,7 @@ namespace Mospolyhelper.Features.Controllers.Account
             [FromHeader] string? sessionId = ""
             )
         {
+            this.logger.LogInformation("GET request /account/info");
             if (string.IsNullOrEmpty(sessionId))
             {
                 return Unauthorized();
@@ -187,6 +199,7 @@ namespace Mospolyhelper.Features.Controllers.Account
             [FromHeader] string? sessionId = ""
             )
         {
+            this.logger.LogInformation("GET request /account/marks");
             if (string.IsNullOrEmpty(sessionId))
             {
                 return Unauthorized();
@@ -212,6 +225,7 @@ namespace Mospolyhelper.Features.Controllers.Account
             [FromHeader] string? sessionId = ""
             )
         {
+            this.logger.LogInformation("GET request /account/applications");
             if (string.IsNullOrEmpty(sessionId))
             {
                 return Unauthorized();
@@ -237,6 +251,7 @@ namespace Mospolyhelper.Features.Controllers.Account
             [FromHeader] string? sessionId = ""
             )
         {
+            this.logger.LogInformation("GET request /account/dialogs");
             if (string.IsNullOrEmpty(sessionId))
             {
                 return Unauthorized();
@@ -263,6 +278,7 @@ namespace Mospolyhelper.Features.Controllers.Account
             [FromHeader] string? sessionId = ""
             )
         {
+            this.logger.LogInformation("GET request /account/dialog");
             if (string.IsNullOrEmpty(sessionId))
             {
                 return Unauthorized();
@@ -286,10 +302,11 @@ namespace Mospolyhelper.Features.Controllers.Account
         [HttpPost("message")]
         public async Task<ActionResult<IList<AccountMessage>>> SendMessage(
             [FromQuery] string dialogKey,
-            [FromBody] MessageObj message,
+            [FromBody] MessageQuery message,
             [FromHeader] string? sessionId = ""
             )
         {
+            this.logger.LogInformation("POST request /account/message");
             if (string.IsNullOrEmpty(sessionId))
             {
                 return Unauthorized();
@@ -312,10 +329,11 @@ namespace Mospolyhelper.Features.Controllers.Account
 
 
         [HttpGet("myportfolio")]
-        public async Task<ActionResult<MyPortfolio>> GetMyPortfolio(
+        public async Task<ActionResult<MyPortfolioQuery>> GetMyPortfolio(
             [FromHeader] string? sessionId = ""
             )
         {
+            this.logger.LogInformation("GET request /account/myportfolio");
             if (string.IsNullOrEmpty(sessionId))
             {
                 return Unauthorized();
@@ -337,11 +355,12 @@ namespace Mospolyhelper.Features.Controllers.Account
         }
 
         [HttpPost("myportfolio")]
-        public async Task<ActionResult<MyPortfolio>> SetMyPortfolio(
-            [FromBody] MyPortfolio portfolio,
+        public async Task<ActionResult<MyPortfolioQuery>> SetMyPortfolio(
+            [FromBody] MyPortfolioQuery portfolio,
             [FromHeader] string? sessionId = ""
             )
         {
+            this.logger.LogInformation("POST request /account/myportfolio");
             if (string.IsNullOrEmpty(sessionId))
             {
                 return Unauthorized();

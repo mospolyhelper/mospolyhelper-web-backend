@@ -1,5 +1,6 @@
 ﻿namespace Mospolyhelper.Domain.Account.UseCase
 {
+    using Microsoft.Extensions.Logging;
     using Mospolyhelper.Domain.Account.Model;
     using Mospolyhelper.Domain.Account.Repository;
     using Mospolyhelper.Utils;
@@ -10,10 +11,15 @@
 
     public class AccountUseCase
     {
+        private readonly ILogger logger;
         private readonly IAccountRepository accountRepository;
 
-        public AccountUseCase(IAccountRepository accountRepository)
+        public AccountUseCase(
+            ILogger<AccountUseCase> logger, 
+            IAccountRepository accountRepository
+            )
         {
+            this.logger = logger;
             this.accountRepository = accountRepository;
         }
 

@@ -1,45 +1,31 @@
-using System.Net.Http;
-using Autofac;
-using Mospolyhelper.Data.Map.Api;
-using Mospolyhelper.Data.Map.Remote;
-using Mospolyhelper.Data.Map.Repository;
-using Mospolyhelper.Domain.Map.Repository;
-using Mospolyhelper.Domain.Map.UseCase;
-
 namespace Mospolyhelper.DI
 {
-    public class MapModule : Module
+    using Microsoft.Extensions.DependencyInjection;
+    using Mospolyhelper.Data.Map.Api;
+    using Mospolyhelper.Data.Map.Remote;
+    using Mospolyhelper.Data.Map.Repository;
+    using Mospolyhelper.DI.Common;
+    using Mospolyhelper.Domain.Map.Repository;
+    using Mospolyhelper.Domain.Map.UseCase;
+
+    public class MapModule : IModule
     {
-        protected override void Load(ContainerBuilder builder)
+        public void Load(IServiceCollection services)
         {
             // Apis
-            builder
-                .Register(c => new MapClient(c.Resolve<HttpClient>()))
-                .As<MapClient>()
-                .SingleInstance();
+            services.AddSingleton<MapClient>();
 
 
             // DataSources
-            builder
-                .Register(c => 
-                    new MapRemoteDataSource(c.Resolve<MapClient>())
-                )
-                .As<MapRemoteDataSource>()
-                .SingleInstance();
+            services.AddSingleton<MapRemoteDataSource>();
 
 
             // Repositories
-            builder
-                .Register(c => new MapRepository(c.Resolve<MapRemoteDataSource>()))
-                .As<IMapRepository>()
-                .SingleInstance();
+            services.AddSingleton<IMapRepository, MapRepository>();
 
 
             // UseCases
-            builder
-                .Register(c => new MapUseCase(c.Resolve<IMapRepository>()))
-                .As<MapUseCase>()
-                .SingleInstance();
+            services.AddSingleton<MapUseCase>();
         }
     }
 }
