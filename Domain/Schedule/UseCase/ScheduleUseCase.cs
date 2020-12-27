@@ -25,6 +25,7 @@ namespace Mospolyhelper.Domain.Schedule.UseCase
 
         public Task<Model.Schedule?> GetSchedule(string id)
         {
+            this.logger.LogDebug($"GetSchedule id = {id}");
             return scheduleRepository.GetSchedule(id);
         }
 
@@ -36,17 +37,20 @@ namespace Mospolyhelper.Domain.Schedule.UseCase
             IEnumerable<string> titles
             )
         {
+            this.logger.LogDebug("GetSchedule with query");
             var schedules = await scheduleRepository.GetAllSchedules();
             return schedules.Filter(titles, types, auditoriums, teachers, groups);
         }
 
         public Task<IEnumerable<Model.Schedule>> GetAllSchedules()
         {
+            this.logger.LogDebug("GetAllSchedules");
             return scheduleRepository.GetAllSchedules();
         }
 
         public async Task<IEnumerable<string>> GetGroupList()
         {
+            this.logger.LogDebug("GetGroupList");
             var schedules = await scheduleRepository.GetAllSchedules();
             return schedules.SelectMany(it =>
                 it.DailySchedules.SelectMany(lessons =>
@@ -59,6 +63,7 @@ namespace Mospolyhelper.Domain.Schedule.UseCase
 
         public async Task<IEnumerable<string>> GetTeacherList()
         {
+            this.logger.LogDebug("GetTeacherList");
             var schedules = await scheduleRepository.GetAllSchedules();
             return schedules.SelectMany(it =>
                 it.DailySchedules.SelectMany(lessons =>
@@ -71,6 +76,7 @@ namespace Mospolyhelper.Domain.Schedule.UseCase
 
         public async Task<IEnumerable<string>> GetAuditoriumList()
         {
+            this.logger.LogDebug("GetAuditoriumList");
             var schedules = await scheduleRepository.GetAllSchedules();
             return schedules.SelectMany(it =>
                 it.DailySchedules.SelectMany(lessons =>
@@ -83,6 +89,7 @@ namespace Mospolyhelper.Domain.Schedule.UseCase
 
         public async Task<IEnumerable<string>> GetTypeList()
         {
+            this.logger.LogDebug("GetTypeList");
             var schedules = await scheduleRepository.GetAllSchedules();
             return schedules.SelectMany(it =>
                 it.DailySchedules.SelectMany(lessons =>
@@ -93,6 +100,7 @@ namespace Mospolyhelper.Domain.Schedule.UseCase
 
         public async Task<IEnumerable<string>> GetTitleList()
         {
+            this.logger.LogDebug("GetTitleList");
             var schedules = await scheduleRepository.GetAllSchedules();
             return schedules.SelectMany(it =>
                 it.DailySchedules.SelectMany(lessons =>

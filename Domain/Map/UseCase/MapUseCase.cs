@@ -21,6 +21,7 @@ namespace Mospolyhelper.Domain.Map.UseCase
 
         public Task<Result<string>> GetMap()
         {
+            this.logger.LogDebug("GetMap");
             return mapRepository.GetMap();
         }
     }
