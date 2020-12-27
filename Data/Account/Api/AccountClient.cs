@@ -210,7 +210,12 @@ namespace Mospolyhelper.Data.Account.Api
             this.logger.LogDebug("GetDialog");
             var builder = new UriBuilder(UrlMessages);
             var query = HttpUtility.ParseQueryString(builder.Query);
-            query["dlg"] = dialogKey;
+            var dialogParams = dialogKey.Split("&s=");
+            query["dlg"] = dialogParams[0];
+            if (dialogParams.Length > 1)
+            {
+                query["s"] = dialogParams[1];
+            }
             builder.Query = query.ToString();
             var url = builder.Uri;
             return GetResponseString(url, HttpMethod.Get, sessionId);
@@ -221,7 +226,12 @@ namespace Mospolyhelper.Data.Account.Api
             this.logger.LogDebug("SendMessage");
             var builder = new UriBuilder(UrlMessages);
             var query = HttpUtility.ParseQueryString(builder.Query);
-            query["dlg"] = dialogKey;
+            var dialogParams = dialogKey.Split("&s=");
+            query["dlg"] = dialogParams[0];
+            if (dialogParams.Length > 1)
+            {
+                query["s"] = dialogParams[1];
+            }
             builder.Query = query.ToString();
             var url = builder.Uri;
 
