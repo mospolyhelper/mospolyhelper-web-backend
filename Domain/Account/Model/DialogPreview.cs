@@ -7,8 +7,18 @@ namespace Mospolyhelper.Domain.Account.Model
 {
     public class DialogPreview
     {
-        public DialogPreview(int id, string dialogKey, string authorName, 
-            string authorGroup, string avatarUrl, string message, string date, bool hasAttachments, bool hasRead)
+        public DialogPreview(
+            int id, 
+            string dialogKey, 
+            string authorName, 
+            string authorGroup, 
+            string avatarUrl, 
+            string message, 
+            string date,
+            string senderImageUrl,
+            string senderName,
+            bool hasAttachments, 
+            bool hasRead)
         {
             Id = id;
             DialogKey = dialogKey;
@@ -17,6 +27,8 @@ namespace Mospolyhelper.Domain.Account.Model
             AvatarUrl = avatarUrl;
             Message = message;
             Date = date;
+            SenderImageUrl = senderImageUrl;
+            SenderName = senderName;
             HasAttachments = hasAttachments;
             HasRead = hasRead;
         }
@@ -28,6 +40,8 @@ namespace Mospolyhelper.Domain.Account.Model
         public string AvatarUrl { get; }
         public string Message { get; }
         public string Date { get; }
+        public string SenderImageUrl { get; }
+        public string SenderName { get; }
         public bool HasAttachments { get;  }
         public bool HasRead { get; }
 

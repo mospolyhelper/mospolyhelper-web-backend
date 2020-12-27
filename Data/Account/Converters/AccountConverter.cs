@@ -458,7 +458,11 @@ namespace Mospolyhelper.Data.Account.Converters
                     tds.Current.Descendants("b").FirstOrDefault()?.InnerText ?? string.Empty;
                 var authorGroup = tds.Current.Descendants("font").FirstOrDefault()?.InnerText ?? string.Empty;
                 tds.MoveNext();
-                var date = tds.Current.Descendants("font").FirstOrDefault()?.InnerText ?? string.Empty;
+                var senderImageUrl = tds.Current.Descendants("img").FirstOrDefault()
+                    ?.GetAttributeValue("src", "img/no_avatar.jpg") ?? "";
+                var senderName = tds.Current.Descendants("img").FirstOrDefault()
+                    ?.GetAttributeValue("title", "") ?? "";
+                var date = tds.Current.Descendants("font").LastOrDefault()?.InnerText ?? string.Empty;
                 var message = tds.Current.InnerHtml.Split("<br>").LastOrDefault()?.Trim() ?? string.Empty;
                 tds.MoveNext();
                 var hasAttachments = tds.Current.InnerHtml.Contains("прикреп", StringComparison.InvariantCultureIgnoreCase);
@@ -473,6 +477,8 @@ namespace Mospolyhelper.Data.Account.Converters
                         imageUrl,
                         message,
                         date,
+                        senderImageUrl,
+                        senderName,
                         hasAttachments,
                         hasRead
                         )
