@@ -26,20 +26,22 @@ namespace Mospolyhelper.Data.Schedule.Remote
 
         public async Task<Domain.Schedule.Model.Schedule?> Get(string groupTitle, bool isSession)
         {
+            this.logger.LogDebug($"Get groupTitle = {groupTitle}, isSession = {isSession}");
             try
             {
                 var scheduleString = await client.GetSchedule(groupTitle, isSession);
-                return converter.Parse(scheduleString);
+                return converter.ParseSchedule(scheduleString);
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "Get");
                 return null;
             }
         }
 
         public async Task<IList<Domain.Schedule.Model.Schedule>> GetAll(bool isSession)
         {
+            this.logger.LogDebug($"GetAll isSession = {isSession}");
             try
             {
                 var scheduleString = await client.GetAllSchedules(isSession);
@@ -47,7 +49,7 @@ namespace Mospolyhelper.Data.Schedule.Remote
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "GetAll");
                 return Array.Empty<Domain.Schedule.Model.Schedule>();
             }
         }

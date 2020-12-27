@@ -22,13 +22,14 @@ namespace Mospolyhelper.Data.Map.Remote
 
         public async Task<Result<string>> Get()
         {
+            this.logger.LogDebug("Get");
             try
             {
                 return Result<string>.Success(await client.GetMap());
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "Get");
                 return Result<string>.Failure(e);
             }
         }

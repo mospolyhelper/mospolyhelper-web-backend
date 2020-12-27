@@ -28,6 +28,7 @@ namespace Mospolyhelper.Data.Schedule.Api
 
         public async Task<string> GetSchedule(string groupTitle, bool isSession)
         {
+            this.logger.LogDebug($"GetSchedule groupTitle = {groupTitle}, isSession = {isSession}");
             var builder = new UriBuilder(UrlGetSchedule);
             var query = HttpUtility.ParseQueryString(builder.Query);
             query["group"] = groupTitle;
@@ -51,6 +52,7 @@ namespace Mospolyhelper.Data.Schedule.Api
 
         public async Task<string> GetAllSchedules(bool isSession)
         {
+            this.logger.LogDebug($"GetAllSchedules isSession = {isSession}");
             var request = new HttpRequestMessage
             {
                 RequestUri = new Uri(isSession ? UrlGetAllSchedulesSession : UrlGetAllSchedules),

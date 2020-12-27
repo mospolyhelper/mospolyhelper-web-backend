@@ -56,6 +56,7 @@ namespace Mospolyhelper.Data.Schedule.Converters
 
         public IList<Domain.Schedule.Model.Schedule> ParseSchedules(string schedulesString)
         {
+            this.logger.LogDebug("ParseSchedules");
             using var json = JsonDocument.Parse(schedulesString);
             var root = json.RootElement;
             var contents = root.GetProperty("contents");
@@ -68,8 +69,9 @@ namespace Mospolyhelper.Data.Schedule.Converters
         }
 
 
-        public Domain.Schedule.Model.Schedule Parse(string scheduleString)
+        public Domain.Schedule.Model.Schedule ParseSchedule(string scheduleString)
         {
+            this.logger.LogDebug("ParseSchedule");
             using var json = JsonDocument.Parse(scheduleString);
             var root = json.RootElement;
 
@@ -105,6 +107,7 @@ namespace Mospolyhelper.Data.Schedule.Converters
 
         private Domain.Schedule.Model.Schedule ParseSchedule(JsonElement json)
         {
+            this.logger.LogDebug("ParseSchedule (private)");
             var isByDate = json.GetProperty(IsSession).GetBoolean();
             var group = json.TryGetProperty(GroupKey, out var groupElement) ? ParseGroup(groupElement) : Group.Empty;
             var dailySchedules = ParseDailySchedules(
@@ -119,6 +122,7 @@ namespace Mospolyhelper.Data.Schedule.Converters
 
         private Group ParseGroup(JsonElement json)
         {
+            this.logger.LogDebug("ParseGroup");
             string title;
             if (json.TryGetProperty(GroupTitleKey, out var titleElement))
             {
@@ -160,6 +164,7 @@ namespace Mospolyhelper.Data.Schedule.Converters
             bool isByDate
         )
         {
+            this.logger.LogDebug("ParseDailySchedules");
             IList<IList<Lesson>> tempList = new IList<Lesson>[]
             {
                 new List<Lesson>(), new List<Lesson>(), new List<Lesson>(),
@@ -234,6 +239,7 @@ namespace Mospolyhelper.Data.Schedule.Converters
             DateTime date
         )
         {
+            this.logger.LogDebug($"ParseLesson order = {order}");
             string title = json.TryGetProperty(LessonTitleKey, out var titleElement)
                 ? titleElement.GetString()
                 : "Не найден ключ названия занятия. " +
@@ -298,6 +304,7 @@ namespace Mospolyhelper.Data.Schedule.Converters
 
         private DateTime ParseDateFrom(string json)
         {
+            this.logger.LogDebug("ParseDateFrom");
             try
             {
                 return DateTime.ParseExact(json, DateFormat, CultureInfo.InvariantCulture);
@@ -310,6 +317,7 @@ namespace Mospolyhelper.Data.Schedule.Converters
 
         private DateTime ParseDateTo(string json)
         {
+            this.logger.LogDebug("ParseDateTo");
             try
             {
                 return DateTime.ParseExact(json, DateFormat, CultureInfo.InvariantCulture);
@@ -322,6 +330,7 @@ namespace Mospolyhelper.Data.Schedule.Converters
 
         private IList<Teacher> ParseTeachers(string json)
         {
+            this.logger.LogDebug("ParseTeachers");
             return json.Trim()
                 .Split(',')
                 .Where(it => it != string.Empty)
@@ -332,6 +341,7 @@ namespace Mospolyhelper.Data.Schedule.Converters
 
         private IList<Auditorium> ParseAuditoriums(JsonElement json)
         {
+            this.logger.LogDebug("ParseAuditoriums");
             var tempList = new List<Auditorium>();
             foreach (var auditorium in json.EnumerateArray())
             {

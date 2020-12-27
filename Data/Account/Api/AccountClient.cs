@@ -90,6 +90,7 @@ namespace Mospolyhelper.Data.Account.Api
 
         public async Task<string> GetSessionId(string login, string password, string? sessionId = null)
         {
+            this.logger.LogDebug("GetSessionId");
             var postData = new NameValueCollection()
             {
                 { "ulogin", login },
@@ -114,6 +115,7 @@ namespace Mospolyhelper.Data.Account.Api
 
         private string? GetCookie(HttpResponseMessage message)
         {
+            this.logger.LogDebug("GetCookie");
             try
             {
                 message.Headers.TryGetValues("Set-Cookie", out var setCookie);
@@ -133,16 +135,19 @@ namespace Mospolyhelper.Data.Account.Api
 
         public Task<string> GetPermissions(string sessionId)
         {
+            this.logger.LogDebug("GetPermissions");
             return GetResponseString(new Uri(UrlInfo), HttpMethod.Get, sessionId);
         }
 
         public Task<string> GetInfo(string sessionId)
         {
+            this.logger.LogDebug("GetInfo");
             return GetResponseString(new Uri(UrlInfo), HttpMethod.Get, sessionId);
         }
 
         public Task<string> GetPortfolio(string searchQuery, int page)
         {
+            this.logger.LogDebug("GetPortfolio");
             var builder = new UriBuilder(UrlPortfolio);
             var query = HttpUtility.ParseQueryString(builder.Query);
             if (searchQuery != string.Empty)
@@ -160,6 +165,7 @@ namespace Mospolyhelper.Data.Account.Api
 
         public Task<string> GetTeachers(string sessionId, string searchQuery, int page)
         {
+            this.logger.LogDebug("GetTeachers");
             var builder = new UriBuilder(UrlTeachers);
             var query = HttpUtility.ParseQueryString(builder.Query);
             if (searchQuery != string.Empty)
@@ -177,26 +183,31 @@ namespace Mospolyhelper.Data.Account.Api
 
         public Task<string> GetMarks(string sessionId)
         {
+            this.logger.LogDebug("GetMarks");
             return GetResponseString(new Uri(UrlMarks), HttpMethod.Get, sessionId);
         }
 
         public Task<string> GetApplications(string sessionId)
         {
+            this.logger.LogDebug("GetApplications");
             return GetResponseString(new Uri(UrlApplications), HttpMethod.Get, sessionId);
         }
 
         public Task<string> GetClassmates(string sessionId)
         {
+            this.logger.LogDebug("GetClassmates");
             return GetResponseString(new Uri(UrlClassmates), HttpMethod.Get, sessionId);
         }
 
         public Task<string> GetDialogs(string sessionId)
         {
+            this.logger.LogDebug("GetDialogs");
             return GetResponseString(new Uri(UrlMessages), HttpMethod.Get, sessionId);
         }
 
         public Task<string> GetDialog(string sessionId, string dialogKey)
         {
+            this.logger.LogDebug("GetDialog");
             var builder = new UriBuilder(UrlMessages);
             var query = HttpUtility.ParseQueryString(builder.Query);
             query["dlg"] = dialogKey;
@@ -207,6 +218,7 @@ namespace Mospolyhelper.Data.Account.Api
 
         public Task<string> SendMessage(string sessionId, string dialogKey, string message, IList<string> fileNames)
         {
+            this.logger.LogDebug("SendMessage");
             var builder = new UriBuilder(UrlMessages);
             var query = HttpUtility.ParseQueryString(builder.Query);
             query["dlg"] = dialogKey;
@@ -232,11 +244,13 @@ namespace Mospolyhelper.Data.Account.Api
 
         public Task<string> GetMyPortfolio(string sessionId)
         {
+            this.logger.LogDebug("GetMyPortfolio");
             return GetResponseString(new Uri(UrlMyPortfolio), HttpMethod.Get, sessionId);
         }
 
         public Task<string> SetMyPortfolio(string sessionId, string otherInfo, bool isPublic)
         {
+            this.logger.LogDebug("SetMyPortfolio");
             var content = new FormUrlEncodedContent(new[]
             {
                 new KeyValuePair<string, string>("otherinfo", Convert.ToBase64String(Encoding.UTF8.GetBytes(otherInfo))),

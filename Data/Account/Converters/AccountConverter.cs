@@ -22,6 +22,7 @@ namespace Mospolyhelper.Data.Account.Converters
 
         public Students ParsePortfolios(string portfolios, int page)
         {
+            this.logger.LogDebug("ParsePortfolios");
             var doc = new HtmlDocument();
             doc.LoadHtml(portfolios);
 
@@ -56,6 +57,7 @@ namespace Mospolyhelper.Data.Account.Converters
 
         private Portfolio ParsePortfolio(IEnumerable<HtmlNode> portfolio)
         {
+            this.logger.LogDebug("ParsePortfolio");
             var id = int.Parse(
                 portfolio.FirstOrDefault()?
                 .GetAttributeValue("id", "myModal_-1")
@@ -88,6 +90,7 @@ namespace Mospolyhelper.Data.Account.Converters
 
         public AccountTeachers ParseTeachers(string teachers, int page)
         {
+            this.logger.LogDebug("ParseTeachers");
             var doc = new HtmlDocument();
             doc.LoadHtml(teachers);
 
@@ -126,6 +129,7 @@ namespace Mospolyhelper.Data.Account.Converters
 
         private AccountTeacher ParseTeacher(HtmlNode tr)
         {
+            this.logger.LogDebug("ParseTeacher");
             var id = int.Parse(
                    tr.GetAttributeValue("id", "t_-1")
                    .Split('_', StringSplitOptions.RemoveEmptyEntries)
@@ -181,6 +185,7 @@ namespace Mospolyhelper.Data.Account.Converters
 
         public IList<string> ParsePermissions(string permissions)
         {
+            this.logger.LogDebug("ParsePermissions");
             var doc = new HtmlDocument();
             doc.LoadHtml(permissions);
 
@@ -204,6 +209,7 @@ namespace Mospolyhelper.Data.Account.Converters
 
         public Info? ParseInfo(string info)
         {
+            this.logger.LogDebug("ParseInfo");
             var doc = new HtmlDocument();
             doc.LoadHtml(info);
 
@@ -288,6 +294,7 @@ namespace Mospolyhelper.Data.Account.Converters
 
         public AccountMarks? ParseMarks(string marks)
         {
+            this.logger.LogDebug("ParseMarks");
             var doc = new HtmlDocument();
             doc.LoadHtml(marks);
             var table = doc.DocumentNode.Descendants("table").LastOrDefault();
@@ -335,6 +342,7 @@ namespace Mospolyhelper.Data.Account.Converters
 
         public IList<Application> ParseApplications(string application)
         {
+            this.logger.LogDebug("ParseApplications");
             var doc = new HtmlDocument();
             doc.LoadHtml(application);
             var table = doc.DocumentNode.Descendants("table").LastOrDefault();
@@ -377,6 +385,7 @@ namespace Mospolyhelper.Data.Account.Converters
 
         public IList<Classmate> ParseClassmates(string classmates)
         {
+            this.logger.LogDebug("ParseClassmates");
             var doc = new HtmlDocument();
             doc.LoadHtml(classmates);
             var table = doc.DocumentNode.Descendants("table").LastOrDefault();
@@ -425,6 +434,7 @@ namespace Mospolyhelper.Data.Account.Converters
 
         public IList<DialogPreview> ParseDialogs(string messages)
         {
+            this.logger.LogDebug("ParseDialogs");
             var doc = new HtmlDocument();
             doc.LoadHtml(messages);
             var table = doc.DocumentNode.Descendants("table").LastOrDefault();
@@ -489,6 +499,7 @@ namespace Mospolyhelper.Data.Account.Converters
 
         public IList<AccountMessage> ParseDialog(string dialog)
         {
+            this.logger.LogDebug("ParseDialog");
             var doc = new HtmlDocument();
             doc.LoadHtml(dialog);
             var table = doc.DocumentNode.Descendants("table").LastOrDefault();
@@ -555,6 +566,7 @@ namespace Mospolyhelper.Data.Account.Converters
 
         public MyPortfolio ParseMyPortfolio(string html)
         {
+            this.logger.LogDebug("ParseMyPortfolio");
             var doc = new HtmlDocument();
             doc.LoadHtml(html);
 
