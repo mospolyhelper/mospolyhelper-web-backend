@@ -28,6 +28,7 @@ namespace Mospolyhelper.Data.Schedule.Repository
 
         public async Task<Domain.Schedule.Model.Schedule?> GetSchedule(string groupTitle)
         {
+            this.logger.LogDebug($"GetSchedule groupTitle = {groupTitle}");
             return ScheduleExt.Combine(
                 await remoteDataSource.Get(groupTitle, false),
                 await remoteDataSource.Get(groupTitle, true)
@@ -36,6 +37,7 @@ namespace Mospolyhelper.Data.Schedule.Repository
 
         public async Task<IEnumerable<Domain.Schedule.Model.Schedule>> GetAllSchedules()
         {
+            this.logger.LogDebug("GetAllSchedules");
             if (localDataSource.IsRequiredUpdate)
             {
                 localDataSource.Schedules = (await remoteDataSource.GetAll(false))

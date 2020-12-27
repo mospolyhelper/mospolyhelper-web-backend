@@ -22,8 +22,8 @@ namespace Mospolyhelper.Data.Map.Repository
 
         public async Task<Result<string>> GetMap()
         {
+            this.logger.LogDebug("GetMap");
             return await remoteDataSource.Get();
         }
-
     }
 }

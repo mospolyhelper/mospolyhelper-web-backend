@@ -20,6 +20,7 @@ namespace Mospolyhelper.Data.Map.Api
 
         public async Task<string> GetMap()
         {
+            this.logger.LogDebug("GetMap");
             var request = new HttpRequestMessage
             {
                 RequestUri = new Uri(Url),

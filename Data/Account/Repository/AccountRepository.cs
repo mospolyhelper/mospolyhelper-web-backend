@@ -26,61 +26,73 @@
 
         public Task<Result<string>> GetSessionId(string login, string password, string? sessionId = null)
         {
+            this.logger.LogDebug("GetSessionId");
             return this.remoteDataSource.GetSessionId(login, password, sessionId);
         }
 
         public Task<Result<IList<string>>> GetPermissions(string sessionId)
         {
+            this.logger.LogDebug("GetPermissions");
             return this.remoteDataSource.GetPermissions(sessionId);
         }
 
         public Task<Result<Students>> GetPortfolios(string searchQuery, int page)
         {
+            this.logger.LogDebug("GetPortfolios");
             return this.remoteDataSource.GetPortfolios(searchQuery, page);
         }
 
         public Task<Result<AccountTeachers>> GetTeachers(string sessionId, string searchQuery, int page)
         {
+            this.logger.LogDebug("GetTeachers");
             return this.remoteDataSource.GetTeachers(sessionId, searchQuery, page);
         }
 
         public Task<Result<IList<Application>>> GetApplications(string sessionId)
         {
+            this.logger.LogDebug("GetApplications");
             return this.remoteDataSource.GetApplications(sessionId);
         }
 
         public Task<Result<IList<Classmate>>> GetClassmates(string sessionId)
         {
+            this.logger.LogDebug("GetClassmates");
             return this.remoteDataSource.GetClassmates(sessionId);
         }
 
         public Task<Result<IList<AccountMessage>>> GetDialog(string sessionId, string dialogKey)
         {
+            this.logger.LogDebug("GetDialog");
             return this.remoteDataSource.GetDialog(sessionId, dialogKey);
         }
 
         public Task<Result<IList<DialogPreview>>> GetDialogs(string sessionId)
         {
+            this.logger.LogDebug("GetDialogs");
             return this.remoteDataSource.GetDialogs(sessionId);
         }
 
         public Task<Result<Info>> GetInfo(string sessionId)
         {
+            this.logger.LogDebug("GetInfo");
             return this.remoteDataSource.GetInfo(sessionId);
         }
 
         public Task<Result<AccountMarks>> GetMarks(string sessionId)
         {
+            this.logger.LogDebug("GetMarks");
             return this.remoteDataSource.GetMarks(sessionId);
         }
 
         public Task<Result<MyPortfolio>> GetMyPortfolio(string sessionId)
         {
+            this.logger.LogDebug("GetMyPortfolio");
             return this.remoteDataSource.GetMyPortfolio(sessionId);
         }
 
         public Task<Result<MyPortfolio>> SetMyPortfolio(string sessionId, string otherInfo, bool isPublic)
         {
+            this.logger.LogDebug("SetMyPortfolio");
             return this.remoteDataSource.SetMyPortfolio(sessionId, otherInfo, isPublic);
         }
 
@@ -91,6 +103,7 @@
             IList<string> fileNames
             )
         {
+            this.logger.LogDebug("SendMessage");
             return this.remoteDataSource.SendMessage(sessionId, dialogKey, message, fileNames);
         }
     }

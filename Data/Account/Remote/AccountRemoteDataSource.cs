@@ -34,19 +34,21 @@ namespace Mospolyhelper.Data.Account.Remote
 
         public async Task<Result<string>> GetSessionId(string login, string password, string? sessionId = null)
         {
+            this.logger.LogDebug("GetSessionId");
             try
             {
                 return Result<string>.Success(await client.GetSessionId(login, password, sessionId));
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "GetSessionId");
                 return Result<string>.Failure(e);
             }
         }
 
         public async Task<Result<IList<string>>> GetPermissions(string sessionId)
         {
+            this.logger.LogDebug("GetPermissions");
             try
             {
                 var res = await client.GetPermissions(sessionId);
@@ -59,13 +61,14 @@ namespace Mospolyhelper.Data.Account.Remote
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "GetPermissions");
                 return Result<IList<string>>.Failure(e);
             }
         }
 
         public async Task<Result<Students>> GetPortfolios(string searchQuery, int page)
         {
+            this.logger.LogDebug("GetPortfolios");
             try
             {
                 var res = await client.GetPortfolio(searchQuery, page);
@@ -73,13 +76,14 @@ namespace Mospolyhelper.Data.Account.Remote
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "GetPortfolios");
                 return Result<Students>.Failure(e);
             }
         }
 
         public async Task<Result<AccountTeachers>> GetTeachers(string sessionId, string searchQuery, int page)
         {
+            this.logger.LogDebug("GetTeachers");
             try
             {
                 var res = await client.GetTeachers(sessionId, searchQuery, page);
@@ -92,13 +96,14 @@ namespace Mospolyhelper.Data.Account.Remote
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "GetTeachers");
                 return Result<AccountTeachers>.Failure(e);
             }
         }
 
         public async Task<Result<Info>> GetInfo(string sessionId)
         {
+            this.logger.LogDebug("GetInfo");
             try
             {
                 var res = await client.GetInfo(sessionId);
@@ -111,13 +116,14 @@ namespace Mospolyhelper.Data.Account.Remote
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "GetInfo");
                 return Result<Info>.Failure(e);
             }
         }
 
         public async Task<Result<AccountMarks>> GetMarks(string sessionId)
         {
+            this.logger.LogDebug("GetMarks");
             try
             {
                 var res = await client.GetMarks(sessionId);
@@ -130,13 +136,14 @@ namespace Mospolyhelper.Data.Account.Remote
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "GetMarks");
                 return Result<AccountMarks>.Failure(e);
             }
         }
 
         public async Task<Result<IList<Application>>> GetApplications(string sessionId)
         {
+            this.logger.LogDebug("GetApplications");
             try
             {
                 var res = await client.GetApplications(sessionId);
@@ -149,13 +156,14 @@ namespace Mospolyhelper.Data.Account.Remote
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "GetApplications");
                 return Result<IList<Application>>.Failure(e);
             }
         }
 
         public async Task<Result<IList<Classmate>>> GetClassmates(string sessionId)
         {
+            this.logger.LogDebug("GetClassmates");
             try
             {
                 var res = await client.GetClassmates(sessionId);
@@ -168,13 +176,14 @@ namespace Mospolyhelper.Data.Account.Remote
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "GetClassmates");
                 return Result<IList<Classmate>>.Failure(e);
             }
         }
 
         public async Task<Result<MyPortfolio>> GetMyPortfolio(string sessionId)
         {
+            this.logger.LogDebug("GetMyPortfolio");
             try
             {
                 var res = await client.GetMyPortfolio(sessionId);
@@ -187,13 +196,14 @@ namespace Mospolyhelper.Data.Account.Remote
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "GetMyPortfolio");
                 return Result<MyPortfolio>.Failure(e);
             }
         }
 
         public async Task<Result<MyPortfolio>> SetMyPortfolio(string sessionId, string otherInfo, bool isPublic)
         {
+            this.logger.LogDebug("SetMyPortfolio");
             try
             {
                 var res = await client.SetMyPortfolio(sessionId, otherInfo, isPublic);
@@ -206,13 +216,14 @@ namespace Mospolyhelper.Data.Account.Remote
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "SetMyPortfolio");
                 return Result<MyPortfolio>.Failure(e);
             }
         }
 
         public async Task<Result<IList<DialogPreview>>> GetDialogs(string sessionId)
         {
+            this.logger.LogDebug("GetDialogs");
             try
             {
                 var res = await client.GetDialogs(sessionId);
@@ -225,13 +236,14 @@ namespace Mospolyhelper.Data.Account.Remote
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "GetDialogs");
                 return Result<IList<DialogPreview>>.Failure(e);
             }
         }
 
         public async Task<Result<IList<AccountMessage>>> GetDialog(string sessionId, string dialogKey)
         {
+            this.logger.LogDebug("GetDialog");
             try
             {
                 var res = await client.GetDialog(sessionId, dialogKey);
@@ -244,7 +256,7 @@ namespace Mospolyhelper.Data.Account.Remote
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "GetDialog");
                 return Result<IList<AccountMessage>>.Failure(e);
             }
         }
@@ -256,6 +268,7 @@ namespace Mospolyhelper.Data.Account.Remote
             IList<string> fileNames
             )
         {
+            this.logger.LogDebug("SendMessage");
             try
             {
                 var res = await this.client.SendMessage(sessionId, dialogKey, message, fileNames);
@@ -268,7 +281,7 @@ namespace Mospolyhelper.Data.Account.Remote
             }
             catch (Exception e)
             {
-                Console.WriteLine(e);
+                this.logger.LogError(e, "SendMessage");
                 return Result<IList<AccountMessage>>.Failure(e);
             }
         }
