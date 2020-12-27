@@ -467,7 +467,7 @@ namespace Mospolyhelper.Data.Account.Converters
                 tds.MoveNext();
                 var hasAttachments = tds.Current.InnerHtml.Contains("прикреп", StringComparison.InvariantCultureIgnoreCase);
                 tds.MoveNext();
-                var hasRead = tds.Current.InnerHtml.Contains("нов", StringComparison.InvariantCultureIgnoreCase);
+                var hasRead = !tds.Current.InnerHtml.Contains("нов", StringComparison.InvariantCultureIgnoreCase);
                 resList.Add(
                     new DialogPreview(
                         id,
