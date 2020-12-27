@@ -25,6 +25,7 @@
             // DataSources
             services.AddSingleton<ScheduleRemoteDataSource>();
             services.AddSingleton<ScheduleLocalDataSource>();
+            services.AddSingleton<ScheduleDataBaseSource>();
 
 
             // Repositories
