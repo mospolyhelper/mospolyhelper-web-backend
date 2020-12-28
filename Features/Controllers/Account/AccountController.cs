@@ -43,6 +43,7 @@ namespace Mospolyhelper.Features.Controllers.Account
 
         public class MessageQuery
         {
+            public string DialogKey { get; set; }
             public string Message { get; set; }
             public IList<string> FileNames { get; set; } = Array.Empty<string>();
         }
@@ -301,7 +302,6 @@ namespace Mospolyhelper.Features.Controllers.Account
 
         [HttpPost("message")]
         public async Task<ActionResult<IList<AccountMessage>>> SendMessage(
-            [FromQuery] string dialogKey,
             [FromBody] MessageQuery message,
             [FromHeader] string? sessionId = ""
             )
@@ -311,7 +311,7 @@ namespace Mospolyhelper.Features.Controllers.Account
             {
                 return Unauthorized();
             }
-            var res = await useCase.SendMessage(sessionId, dialogKey, message.Message, message.FileNames);
+            var res = await useCase.SendMessage(sessionId, message.DialogKey, message.Message, message.FileNames);
             if (res.IsSuccess)
             {
                 return Ok(res.GetOrNull());
