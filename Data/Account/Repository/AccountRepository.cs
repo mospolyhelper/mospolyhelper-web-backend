@@ -54,6 +54,12 @@
             return this.remoteDataSource.GetApplications(sessionId);
         }
 
+        public Task<Result<Payments>> GetPayments(string sessionId)
+        {
+            this.logger.LogDebug("GetPayments");
+            return this.remoteDataSource.GetPayments(sessionId);
+        }
+
         public Task<Result<IList<Classmate>>> GetClassmates(string sessionId)
         {
             this.logger.LogDebug("GetClassmates");

@@ -170,7 +170,7 @@ namespace Mospolyhelper.Data.Account.Converters
             { "?p=about", "" },
             { "?p=alerts", "" },
             { "?p=messages", "dialogs" },
-            { "?p=payments", "" },
+            { "?p=payments", "payments" },
             { "?p=rasp", "" },
             { "?p=marks", "marks" },
             { "?p=stud_stats", "" },
@@ -180,7 +180,7 @@ namespace Mospolyhelper.Data.Account.Converters
             { "?p=teachers", "teachers" },
             { "?p=sprav", "applications" },
             { "?p=myportfolio", "myportfolio" },
-            { "?p=portfolio", "portfolios" },
+            { "?p=portfolio", "portfolios" }
         };
 
         public IList<string> ParsePermissions(string permissions)
@@ -381,6 +381,147 @@ namespace Mospolyhelper.Data.Account.Converters
                     );
             }
             return resList;
+        }
+
+        public Payments ParsePayments(string payments)
+        {
+            this.logger.LogDebug("ParseApplications");
+            var doc = new HtmlDocument();
+            doc.LoadHtml(payments);
+            var content = doc.DocumentNode.Descendants("div")
+                .Where(it => it.GetAttributeValue("id", string.Empty) == "content")
+                .FirstOrDefault();
+            if (content == null)
+            {
+                return new Payments(new Dictionary<string, Contract>());
+            }
+            var resDict = new Dictionary<string, Contract>();
+
+            var tables = content.Descendants("table").GetEnumerator();
+            var amounts = content.Descendants("p")
+                .Where(it => it.InnerHtml.Contains("руб", StringComparison.InvariantCultureIgnoreCase))
+                .GetEnumerator();
+            var hasDormContract = content.Descendants("h4")
+                .Any(it => it.InnerHtml.Contains("ОПЛАТА ЗА ОБЩЕЖИТИЕ", StringComparison.InvariantCultureIgnoreCase));
+            if (hasDormContract && tables.MoveNext())
+            {
+                var table = tables.Current;
+                amounts.MoveNext();
+                int.TryParse(
+                    new Regex(@"сумма:\s*?(.+?)\s*?руб.").Match(amounts.Current.InnerHtml)
+                    .Groups.Values.ElementAtOrDefault(1)?.Value ?? string.Empty, 
+                    out var paidAmount
+                    );
+                var contractName = new Regex(@"<i>(.+?) г\.,").Match(amounts.Current.InnerHtml)
+                    .Groups.Values.ElementAtOrDefault(1)?.Value ?? string.Empty;
+                amounts.MoveNext();
+                int.TryParse(
+                    new Regex(@"<b>(.+?)<\/b>\s*?руб").Match(amounts.Current.InnerHtml)
+                    .Groups.Values.ElementAtOrDefault(1)?.Value ?? string.Empty,
+                    out var debt
+                    );
+                var debtDate = new Regex(@"на (.+?) г\.").Match(amounts.Current.InnerHtml)
+                    .Groups.Values.ElementAtOrDefault(1)?.Value ?? string.Empty;
+                amounts.MoveNext();
+                int.TryParse(
+                    new Regex(@"<b>(.+?)<\/b>\s*?руб").Match(amounts.Current.InnerHtml)
+                    .Groups.Values.ElementAtOrDefault(1)?.Value ?? string.Empty,
+                    out var remainingAmount
+                    );
+                var expirationDate = new Regex(@"\(до (.+?) г\.").Match(amounts.Current.InnerHtml)
+                    .Groups.Values.ElementAtOrDefault(1)?.Value ?? string.Empty;
+
+                var paymentList = new List<Payment>();
+                foreach (var tr in table.Descendants("tr"))
+                {
+                    var tds = tr.Descendants("td").GetEnumerator();
+                    tds.MoveNext();
+                    var date = tds.Current.InnerHtml;
+                    tds.MoveNext();
+                    tds.MoveNext();
+                    int.TryParse(
+                        new string(
+                            (tds.Current.Descendants("b").FirstOrDefault()?.InnerHtml ?? string.Empty)
+                            .Where(it => char.IsDigit(it) || it == '-').ToArray()
+                            ),
+                        out var amount
+                        );
+                    paymentList.Add(new Payment(date, amount));
+                }
+                var sberQR = content.Descendants("img").ElementAtOrDefault(1)?.GetAttributeValue("src", string.Empty) ?? string.Empty;
+                resDict["dormitory"] = new Contract(
+                    contractName,
+                    paidAmount,
+                    debt,
+                    debtDate,
+                    remainingAmount,
+                    expirationDate,
+                    paymentList,
+                    sberQR
+                    );
+            }
+
+            var hasTuitionContract = content.Descendants("h4")
+                .Any(it => it.InnerHtml.Contains("ОПЛАТА ЗА ОБУЧЕНИЕ", StringComparison.InvariantCultureIgnoreCase));
+            if (hasTuitionContract && tables.MoveNext())
+            {
+                var table = tables.Current;
+                amounts.MoveNext();
+                int.TryParse(
+                    new Regex(@"сумма:\s*?(.+?)\s*?руб.").Match(amounts.Current.InnerHtml)
+                    .Groups.Values.ElementAtOrDefault(1)?.Value ?? string.Empty,
+                    out var paidAmount
+                    );
+                var contractName = new Regex(@"<i>(.+?) г\.,").Match(amounts.Current.InnerHtml)
+                    .Groups.Values.ElementAtOrDefault(1)?.Value ?? string.Empty;
+                amounts.MoveNext();
+                int.TryParse(
+                    new Regex(@"<b>(.+?)<\/b>\s*?руб").Match(amounts.Current.InnerHtml)
+                    .Groups.Values.ElementAtOrDefault(1)?.Value ?? string.Empty,
+                    out var debt
+                    );
+                var debtDate = new Regex(@"на (.+?) г\.").Match(amounts.Current.InnerHtml)
+                    .Groups.Values.ElementAtOrDefault(1)?.Value ?? string.Empty;
+                amounts.MoveNext();
+                int.TryParse(
+                    new Regex(@"<b>(.+?)<\/b>\s*?руб").Match(amounts.Current.InnerHtml)
+                    .Groups.Values.ElementAtOrDefault(1)?.Value ?? string.Empty,
+                    out var remainingAmount
+                    );
+                var expirationDate = new Regex(@"\(до (.+?) г\.").Match(amounts.Current.InnerHtml)
+                    .Groups.Values.ElementAtOrDefault(1)?.Value ?? string.Empty;
+
+                var paymentList = new List<Payment>();
+                foreach (var tr in table.Descendants("tr"))
+                {
+                    var tds = tr.Descendants("td").GetEnumerator();
+                    tds.MoveNext();
+                    var date = tds.Current.InnerHtml;
+                    tds.MoveNext();
+                    tds.MoveNext();
+                    int.TryParse(
+                        new string(
+                            (tds.Current.Descendants("b").FirstOrDefault()?.InnerHtml ?? string.Empty)
+                            .Where(it => char.IsDigit(it) || it == '-').ToArray()
+                            ),
+                        out var amount
+                        );
+                    paymentList.Add(new Payment(date, amount));
+                }
+                var sberQR = string.Empty;
+                resDict["tuition"] = new Contract(
+                    contractName,
+                    paidAmount,
+                    debt,
+                    debtDate,
+                    remainingAmount,
+                    expirationDate,
+                    paymentList,
+                    sberQR
+                    );
+            }
+
+            return new Payments(resDict);
         }
 
         public IList<Classmate> ParseClassmates(string classmates)

@@ -193,6 +193,12 @@ namespace Mospolyhelper.Data.Account.Api
             return GetResponseString(new Uri(UrlApplications), HttpMethod.Get, sessionId);
         }
 
+        public Task<string> GetPayments(string sessionId)
+        {
+            this.logger.LogDebug("GetPayments");
+            return GetResponseString(new Uri(UrlPayments), HttpMethod.Get, sessionId);
+        }
+
         public Task<string> GetClassmates(string sessionId)
         {
             this.logger.LogDebug("GetClassmates");

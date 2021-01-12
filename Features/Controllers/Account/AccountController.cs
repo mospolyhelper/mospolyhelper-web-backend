@@ -247,6 +247,32 @@ namespace Mospolyhelper.Features.Controllers.Account
             return StatusCode(500);
         }
 
+        [HttpGet("payments")]
+        public async Task<ActionResult<Payments>> GetPayments(
+            [FromHeader] string? sessionId = ""
+            )
+        {
+            this.logger.LogInformation("GET request /account/payments");
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Unauthorized();
+            }
+            var res = await useCase.GetPayments(sessionId);
+            if (res.IsSuccess)
+            {
+                return Ok(res.GetOrNull());
+            }
+            else if (res.IsFailure)
+            {
+                return (res.ExceptionOrNull()) switch
+                {
+                    UnauthorizedAccessException e => Unauthorized(),
+                    _ => StatusCode(500),
+                };
+            }
+            return StatusCode(500);
+        }
+
         [HttpGet("dialogs")]
         public async Task<ActionResult<IList<DialogPreview>>> GetDialogs(
             [FromHeader] string? sessionId = ""

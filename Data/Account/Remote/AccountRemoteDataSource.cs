@@ -161,6 +161,26 @@ namespace Mospolyhelper.Data.Account.Remote
             }
         }
 
+        public async Task<Result<Payments>> GetPayments(string sessionId)
+        {
+            this.logger.LogDebug("GetPayments");
+            try
+            {
+                var res = await client.GetPayments(sessionId);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<Payments>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<Payments>.Success(converter.ParsePayments(res));
+            }
+            catch (Exception e)
+            {
+                this.logger.LogError(e, "GetApplications");
+                return Result<Payments>.Failure(e);
+            }
+        }
+
         public async Task<Result<IList<Classmate>>> GetClassmates(string sessionId)
         {
             this.logger.LogDebug("GetClassmates");
