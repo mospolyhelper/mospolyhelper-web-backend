@@ -23,6 +23,8 @@
 
         public Task<Result<IList<Application>>> GetApplications(string sessionId);
 
+        public Task<Result<Payments>> GetPayments(string sessionId);
+
         public Task<Result<IList<Classmate>>> GetClassmates(string sessionId);
 
         public Task<Result<MyPortfolio>> GetMyPortfolio(string sessionId);

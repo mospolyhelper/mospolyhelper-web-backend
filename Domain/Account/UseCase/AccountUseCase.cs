@@ -59,6 +59,12 @@
             return this.accountRepository.GetApplications(sessionId);
         }
 
+        public Task<Result<Payments>> GetPayments(string sessionId)
+        {
+            this.logger.LogDebug("GetPayments");
+            return this.accountRepository.GetPayments(sessionId);
+        }
+
         public Task<Result<IList<Classmate>>> GetClassmates(string sessionId)
         {
             this.logger.LogDebug("GetClassmates");
