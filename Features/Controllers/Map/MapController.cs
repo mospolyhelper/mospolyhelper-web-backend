@@ -5,9 +5,9 @@ namespace Mospolyhelper.Features.Controllers.Map
     using Microsoft.Extensions.Logging;
     using Mospolyhelper.Domain.Map.UseCase;
 
-    [ApiController]
-    [Route("[controller]")]
     [Produces("application/json")]
+    [ApiVersion("0.1")]
+    [ApiController, Route("[controller]")]
     public class MapController : ControllerBase
     {
         private readonly ILogger logger;

@@ -1,19 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
-using Mospolyhelper.Data.Account.Api;
-using Mospolyhelper.Data.Account.Remote;
-using Mospolyhelper.Domain.Account.Model;
-using Mospolyhelper.Domain.Account.UseCase;
-using Mospolyhelper.Utils;
-
-namespace Mospolyhelper.Features.Controllers.Account
+﻿namespace Mospolyhelper.Features.Controllers.Account
 {
-    [ApiController]
-    [Route("[controller]")]
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Logging;
+    using Mospolyhelper.Domain.Account.Model;
+    using Mospolyhelper.Domain.Account.UseCase;
+
     [Produces("application/json")]
+    [ApiVersion("0.1")]
+    [ApiController, Route("[controller]")]
     public class AccountController : ControllerBase
     {
         private readonly ILogger logger;
@@ -206,6 +203,33 @@ namespace Mospolyhelper.Features.Controllers.Account
                 return Unauthorized();
             }
             var res = await useCase.GetMarks(sessionId);
+            if (res.IsSuccess)
+            {
+                return Ok(res.GetOrNull());
+            }
+            else if (res.IsFailure)
+            {
+                return (res.ExceptionOrNull()) switch
+                {
+                    UnauthorizedAccessException e => Unauthorized(),
+                    _ => StatusCode(500),
+                };
+            }
+            return StatusCode(500);
+        }
+
+        [HttpGet("grade-sheets")]
+        public async Task<ActionResult<GradeSheets>> GetGradeSheets(
+            [FromQuery] string? semester = "",
+            [FromHeader] string? sessionId = ""
+            )
+        {
+            this.logger.LogInformation("GET request /account/marks");
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Unauthorized();
+            }
+            var res = await useCase.GetGradeSheets(sessionId, semester ?? string.Empty);
             if (res.IsSuccess)
             {
                 return Ok(res.GetOrNull());

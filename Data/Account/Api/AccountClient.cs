@@ -43,7 +43,7 @@ namespace Mospolyhelper.Data.Account.Api
         private const string UrlPayments = UrlBase + "/?p=payments";
         private const string UrlSchedules = UrlBase + "/?p=rasp";
         private const string UrlMarks = UrlBase + "/?p=marks";
-        private const string UrlStatement = UrlBase + "/?p=stud_stats";
+        private const string UrlGradeSheets = UrlBase + "/?p=stud_stats";
         private const string UrlProjects = UrlBase + "/?p=projects";
         private const string UrlPhysed = UrlBase + "/?p=phys";
         private const string UrlClassmates = UrlBase + "/?p=group";
@@ -86,6 +86,14 @@ namespace Mospolyhelper.Data.Account.Api
                 request.Headers.Add(key, value);
             }
             return client.SendAsync(request);
+        }
+
+        private ByteArrayContent ToUrlEncodedForm(NameValueCollection contentList)
+        {
+            var data = Encoding.GetEncoding(1251).GetBytes(contentList.ToWindows1251UrlEncodedQuery());
+            var content = new ByteArrayContent(data);
+            content.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
+            return content;
         }
 
         public async Task<string> GetSessionId(string login, string password, string? sessionId = null)
@@ -187,6 +195,25 @@ namespace Mospolyhelper.Data.Account.Api
             return GetResponseString(new Uri(UrlMarks), HttpMethod.Get, sessionId);
         }
 
+        public Task<string> GetGradeSheets(string sessionId, string semester)
+        {
+            this.logger.LogDebug("GetGradeSheets");
+            if (semester == string.Empty)
+            {
+                return GetResponseString(new Uri(UrlGradeSheets), HttpMethod.Get, sessionId);
+            }
+            else
+            {
+                var contentList = new NameValueCollection()
+                {
+                    { "kvartal", semester }
+                };
+                var content = ToUrlEncodedForm(contentList);
+
+                return GetResponseString(new Uri(UrlGradeSheets), HttpMethod.Post, sessionId, content);
+            }
+        }
+
         public Task<string> GetApplications(string sessionId)
         {
             this.logger.LogDebug("GetApplications");
@@ -251,10 +278,8 @@ namespace Mospolyhelper.Data.Account.Api
             {
                 contentList.Add("ufile[]", fileName);
             }
-            var data = Encoding.GetEncoding(1251).GetBytes(contentList.ToWindows1251UrlEncodedQuery());
-            var content = new ByteArrayContent(data);
-            content.Headers.Add("Content-Type", "application/x-www-form-urlencoded");
 
+            var content = ToUrlEncodedForm(contentList);
             return GetResponseString(url, HttpMethod.Post, sessionId, content);
         }
 

@@ -21,6 +21,8 @@
 
         public Task<Result<AccountMarks>> GetMarks(string sessionId);
 
+        public Task<Result<GradeSheets>> GetGradeSheets(string sessionId, string semester);
+
         public Task<Result<IList<Application>>> GetApplications(string sessionId);
 
         public Task<Result<Payments>> GetPayments(string sessionId);

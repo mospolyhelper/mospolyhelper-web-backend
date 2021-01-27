@@ -8,9 +8,9 @@ using Mospolyhelper.Domain.Schedule.UseCase;
 
 namespace Mospolyhelper.Features.Controllers.Schedule
 {
-    [ApiController]
-    [Route("[controller]")]
     [Produces("application/json")]
+    [ApiVersion("0.1")]
+    [ApiController, Route("[controller]")]
     public class ScheduleController : ControllerBase
     {
         private readonly ILogger logger;
