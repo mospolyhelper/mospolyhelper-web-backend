@@ -67,15 +67,15 @@ namespace Mospolyhelper.Data.Account.Converters
             var name = portfolio.FirstOrDefault()?.Descendants("h4")?.FirstOrDefault()?.InnerText ?? string.Empty;
             var body = portfolio.ElementAtOrDefault(1)?.InnerHtml ?? string.Empty;
             var group = new Regex("Группа: <b>(.+?)<\\/b><br")
-                .Match(body).Groups[1].Value;
+                .Match(body).Groups[1].Value.Trim();
             var direction = new Regex("Направление подготовки \\(специальность\\): <b>(.+?)<\\/b><br")
-                .Match(body).Groups[1].Value;
+                .Match(body).Groups[1].Value.Trim();
             var specialization = new Regex("Специализация: <b>(.+?)<\\/b><br")
-                .Match(body).Groups[1].Value;
+                .Match(body).Groups[1].Value.Trim();
             var course = new Regex("Курс: <b>(.+?)<\\/b><br")
-                .Match(body).Groups[1].Value;
+                .Match(body).Groups[1].Value.Trim();
             var educationForm = new Regex("Форма обучения: <b>(.+?)<\\/b><br")
-                .Match(body).Groups[1].Value;
+                .Match(body).Groups[1].Value.Trim();
 
             return new Portfolio(
                 id,
