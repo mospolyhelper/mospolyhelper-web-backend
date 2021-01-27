@@ -141,6 +141,26 @@ namespace Mospolyhelper.Data.Account.Remote
             }
         }
 
+        public async Task<Result<GradeSheets>> GetGradeSheets(string sessionId, string semester)
+        {
+            this.logger.LogDebug("GetGradeSheets");
+            try
+            {
+                var res = await client.GetGradeSheets(sessionId, semester);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<GradeSheets>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<GradeSheets>.Success(converter.ParseGradeSheets(res));
+            }
+            catch (Exception e)
+            {
+                this.logger.LogError(e, "GetGradeSheets");
+                return Result<GradeSheets>.Failure(e);
+            }
+        }
+
         public async Task<Result<IList<Application>>> GetApplications(string sessionId)
         {
             this.logger.LogDebug("GetApplications");

@@ -77,6 +77,12 @@
             return this.accountRepository.GetMarks(sessionId);
         }
 
+        public Task<Result<GradeSheets>> GetGradeSheets(string sessionId, string semester)
+        {
+            this.logger.LogDebug("GetGradeSheets");
+            return this.accountRepository.GetGradeSheets(sessionId, semester);
+        }
+
         public Task<Result<MyPortfolio>> GetMyPortfolio(string sessionId)
         {
             this.logger.LogDebug("GetMyPortfolio");

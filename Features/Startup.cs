@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -8,10 +8,12 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
@@ -19,6 +21,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Mospolyhelper.DI;
 using Mospolyhelper.DI.Common;
@@ -59,41 +62,90 @@ namespace Mospolyhelper
                 options.Conventions.Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer()));
             });
 
-            services.AddSwaggerGen(c =>
+            services.AddSwaggerGen(config =>
             {
-                //c.OperationFilter<AuthorizeOperationFilter>();
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "mospolyhelper", Version = "v1" });
-                //c.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
-                //{
-                //    Type = SecuritySchemeType.OAuth2,
-                //    Flows = new OpenApiOAuthFlows
-                //    {
-                //        Implicit = new OpenApiOAuthFlow
-                //        {
-                //            AuthorizationUrl = new Uri("auth", UriKind.Relative),
-                //            Scopes = new Dictionary<string, string>
-                //            {
-                //                { "readAccess", "Access read operations" },
-                //                { "writeAccess", "Access write operations" }
-                //            }
-                //        }
-                //    }
-                //});
+                var titleBase = "Mospolyhelper API";
+                var description = "This is a Web API for Mospolyhelper apps";
+                var TermsOfService = new Uri("https://mospolytech.ru/");
+                var License = new OpenApiLicense()
+                {
+                    Name = "MIT"
+                };
+
+                config.SwaggerDoc("v0.1", new OpenApiInfo
+                {
+                    Version = "v0.1",
+                    Title = titleBase + " v0.1",
+                    Description = description,
+                    License = License
+                });
+
+                config.SwaggerDoc("v0.2", new OpenApiInfo
+                {
+                    Version = "v0.2",
+                    Title = titleBase + " v2",
+                    Description = description,
+                    License = License
+                });
+
+                config.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme()
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.ApiKey,
+                    In = ParameterLocation.Header,
+                    Scheme = "Bearer",
+                    //BearerFormat = "JWT",
+                    Description = "JWT Authorization header using the Bearer scheme. \r\n\r\n Enter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: \"Bearer 12345abcdef\"",
+                });
+                config.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                          new OpenApiSecurityScheme
+                            {
+                                Reference = new OpenApiReference
+                                {
+                                    Type = ReferenceType.SecurityScheme,
+                                    Id = "Bearer"
+                                },
+                                Name = "Bearer",
+                              In = ParameterLocation.Header
+                            },
+                            new string[] {}
+
+                    }
+                });
             });
 
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = false,
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    //ValidIssuer = Configuration["Jwt:Issuer"],
+                    //ValidAudience = Configuration["Jwt:Issuer"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("mysupersecret_secretqqq!123")) //Configuration["JwtToken:SecretKey"]  
+                };
+            });
 
-            //services
-            //    .AddAuthentication(options =>
-            //    {
-            //        options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-            //        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            //    })
-            //    .AddJwtBearer(options =>
-            //    {
-            //        Configuration.Bind($"{nameof(AppSettings.Security)}:{nameof(AppSettings.Security.Jwt)}", options);
-            //    })
-            //    .Services
-            //    .AddHttpClient();
+            services.AddApiVersioning(options =>
+            {
+                // reporting api versions will return the headers "api-supported-versions" and "api-deprecated-versions"
+                options.AssumeDefaultVersionWhenUnspecified = true;
+                options.DefaultApiVersion = new ApiVersion(0, 1);
+                options.ReportApiVersions = true;
+            });
+            services.AddVersionedApiExplorer(options =>
+            {
+                // add the versioned api explorer, which also adds IApiVersionDescriptionProvider service
+                // note: the specified format code will format the version as "'v'major[.minor][-status]"
+                options.GroupNameFormat = "'v'VVV";
+                // note: this option is only necessary when versioning by url segment. the SubstitutionFormat
+                // can also be used to control the format of the API version in route templates
+                options.SubstituteApiVersionInUrl = true;
+            });
 
             services
                 .RegisterModule(new CoreModule())
@@ -103,7 +155,7 @@ namespace Mospolyhelper
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, IApiVersionDescriptionProvider provider)
         {
             //if (env.IsDevelopment())
             //{
@@ -112,30 +164,28 @@ namespace Mospolyhelper
 
             //app.UseHttpsRedirection();
 
-            
-            //app.UseCors(x => x.WithOrigins("http://localhost:1525").AllowAnyMethod().AllowAnyHeader().AllowCredentials());
             app.UseSwagger();
             
             // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),
             // specifying the Swagger JSON endpoint.
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                // build a swagger endpoint for each discovered API version  
+                foreach (var description in provider.ApiVersionDescriptions)
+                {
+                    c.SwaggerEndpoint(
+                        $"/swagger/{description.GroupName}/swagger.json", 
+                        description.GroupName.ToUpperInvariant()
+                        );
+                }
                 c.RoutePrefix = string.Empty;
-
-                //c.OAuthClientId("cleint-id");
-                //c.OAuthClientSecret("client-secret");
-                //c.OAuthRealm("client-realm");
-                //c.OAuthAppName("mospolyhelper API");
-                //c.OAuthUseBasicAuthenticationWithAccessCodeGrant();
-                //c.OAuthUsePkce();
             });
             
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCors("MyPolicy");
-            //app.UseAuthentication(); // --
-            //app.UseAuthorization(); // --
+            app.UseAuthentication();
+            app.UseAuthorization();
 
 
             app.UseEndpoints(endpoints =>

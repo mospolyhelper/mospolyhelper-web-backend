@@ -173,7 +173,7 @@ namespace Mospolyhelper.Data.Account.Converters
             { "?p=payments", "payments" },
             { "?p=rasp", "" },
             { "?p=marks", "marks" },
-            { "?p=stud_stats", "" },
+            { "?p=stud_stats", "grade-sheets" },
             { "?p=projects", "" },
             { "?p=phys", "" },
             { "?p=group", "classmates" },
@@ -338,6 +338,67 @@ namespace Mospolyhelper.Data.Account.Converters
                 }
             }
             return new AccountMarks(tempListOfList);
+        }
+
+        public GradeSheets? ParseGradeSheets(string gradeSheets)
+        {
+            this.logger.LogDebug("ParseGradeSheets");
+            var doc = new HtmlDocument();
+            doc.LoadHtml(gradeSheets);
+            var semestersNode = doc.DocumentNode.Descendants("select")
+                .FirstOrDefault(it => it.GetAttributeValue("name", string.Empty) == "kvartal")
+                ?.Descendants("option") ?? Array.Empty<HtmlNode>();
+            var semester = semestersNode.FirstOrDefault(it => it.GetAttributeValue("selected", string.Empty) == "selected")
+                ?.GetAttributeValue("value", string.Empty) ?? string.Empty;
+            var semesterList = semestersNode.Select(it => it.GetAttributeValue("value", string.Empty)).ToList();
+
+            var table = doc.DocumentNode.Descendants("table").LastOrDefault();
+            if (table == null)
+            {
+                return null;
+            }
+
+            var sheetList = new List<GradeSheet>();
+
+            var trs = table.Descendants("tr").GetEnumerator();
+            trs.MoveNext();
+            while (trs.MoveNext())
+            {
+                var tds = trs.Current.Descendants("td").GetEnumerator();
+                tds.MoveNext();
+                tds.MoveNext();
+                var number = tds.Current.InnerText;
+                tds.MoveNext();
+                var subject = tds.Current.InnerText;
+                while (subject.EndsWith("\r\n"))
+                {
+                    subject = subject.Remove(subject.Length - "\r\n".Length);
+                }
+                tds.MoveNext();
+                var sheetType = tds.Current.InnerText;
+                tds.MoveNext();
+                var loadType = tds.Current.InnerText;
+                tds.MoveNext();
+                var appraisalsDate = tds.Current.InnerText;
+                if (appraisalsDate.EndsWith("\r\n"))
+                {
+                    appraisalsDate = appraisalsDate.Remove(appraisalsDate.Length - "\r\n".Length);
+                }
+                tds.MoveNext();
+                var grade = tds.Current.InnerText;
+                tds.MoveNext();
+                var courseAndSemester = tds.Current.InnerText;
+                sheetList.Add(new GradeSheet(
+                    number,
+                    subject,
+                    sheetType,
+                    loadType,
+                    appraisalsDate,
+                    grade,
+                    courseAndSemester
+                    ));
+            }
+            return new GradeSheets(semester, semesterList, sheetList);
         }
 
         public IList<Application> ParseApplications(string application)
