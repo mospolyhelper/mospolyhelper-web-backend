@@ -379,7 +379,7 @@ namespace Mospolyhelper.Data.Account.Converters
                 tds.MoveNext();
                 var loadType = tds.Current.InnerText;
                 tds.MoveNext();
-                var appraisalsDate = tds.Current.InnerText;
+                var appraisalsDate = tds.Current.InnerHtml.Replace("<br>", " ");
                 if (appraisalsDate.EndsWith("\r\n"))
                 {
                     appraisalsDate = appraisalsDate.Remove(appraisalsDate.Length - "\r\n".Length);
