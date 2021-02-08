@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System;
+using System.Text.Json.Serialization;
 
 namespace Mospolyhelper.Domain.Schedule.Model
 {
@@ -14,6 +15,28 @@ namespace Mospolyhelper.Domain.Schedule.Model
         {
             this.Title = title;
             this.Evening = evening;
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj is Group other)
+            {
+                return Equals(other);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        protected bool Equals(Group other)
+        {
+            return Title == other.Title && Evening == other.Evening;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Title, Evening);
         }
 
         public override string ToString()

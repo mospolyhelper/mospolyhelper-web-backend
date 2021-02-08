@@ -306,5 +306,40 @@ namespace Mospolyhelper.Domain.Schedule.Model
                 return LABORATORY;
             return null;
         }
+
+        public static string FixTeacherType(string type, string lessonTitle)
+        {
+            if (type.Equals(COURSE_PROJECT_SHORT, StringComparison.InvariantCultureIgnoreCase))
+                return COURSE_PROJECT_FIXED;
+            if (type.Equals(CREDIT_WITH_MARK_SHORT, StringComparison.InvariantCultureIgnoreCase))
+                return CREDIT_WITH_MARK_FIXED;
+            if (type.Equals(EXAMINATION_SHOW_SHORT, StringComparison.InvariantCultureIgnoreCase))
+                return EXAMINATION_SHOW_FIXED;
+            if (type.Equals(EXAM_SHORT, StringComparison.InvariantCultureIgnoreCase))
+                return EXAM;
+            if (type.Equals(CREDIT_SHORT, StringComparison.InvariantCultureIgnoreCase))
+                return CREDIT;
+            if (type.Equals(CONSULTATION_SHORT, StringComparison.InvariantCultureIgnoreCase))
+                return CONSULTATION;
+            if (type.Equals(LABORATORY_SHORT, StringComparison.InvariantCultureIgnoreCase))
+                return LABORATORY_FULL;
+            if (type.Equals(PRACTICE_SHORT2, StringComparison.InvariantCultureIgnoreCase))
+                return PRACTICE;
+            if (type.Equals(LECTURE_SHORT, StringComparison.InvariantCultureIgnoreCase))
+                return LECTURE;
+            if (type.Equals(OTHER_SHORT, StringComparison.InvariantCultureIgnoreCase))
+            {
+                var res = string.Join(", ", regex.Matches(lessonTitle).Select(it => it.Value));
+                if (res != string.Empty)
+                {
+                    return FindCombinedShortTypeOrNull(res) ?? type;
+                }
+                else
+                {
+                    return type;
+                }
+            }
+            return type;
+        }
     }
 }

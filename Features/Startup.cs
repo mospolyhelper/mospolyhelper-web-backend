@@ -1,31 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
 using System.Text;
-using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApiExplorer;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Mospolyhelper.DI;
 using Mospolyhelper.DI.Common;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 namespace Mospolyhelper
 {
@@ -148,10 +135,11 @@ namespace Mospolyhelper
             });
 
             services
-                .RegisterModule(new CoreModule())
-                .RegisterModule(new ScheduleModule())
-                .RegisterModule(new AccountModule())
-                .RegisterModule(new MapModule());
+                .RegisterModule(new DI.CoreModule())
+                .RegisterModule(new DI.ScheduleModule())
+                .RegisterModule(new DI.AccountModule())
+                .RegisterModule(new DI.V0_2.AccountModule())
+                .RegisterModule(new DI.MapModule());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

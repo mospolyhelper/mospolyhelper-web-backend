@@ -37,7 +37,13 @@ namespace Mospolyhelper.Data.Account.Remote
             this.logger.LogDebug("GetSessionId");
             try
             {
-                return Result<string>.Success(await client.GetSessionId(login, password, sessionId));
+                var res = await client.GetSessionId(login, password, sessionId);
+                var isAuthorized = CheckAuthorization(res.Item2);
+                if (!isAuthorized)
+                {
+                    return Result<string>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<string>.Success(res.Item1);
             }
             catch (Exception e)
             {

@@ -26,7 +26,15 @@ namespace Mospolyhelper.Domain.Schedule.UseCase
         public Task<Model.Schedule?> GetSchedule(string id)
         {
             this.logger.LogDebug($"GetSchedule id = {id}");
+            //var schedules = await scheduleRepository.GetAllByTeacher();
+            //return schedules.Filter(groups: new List<string>() { id });
             return scheduleRepository.GetSchedule(id);
+        }
+
+        public Task<Model.Schedule?> GetScheduleByTeacher(string id)
+        {
+            this.logger.LogDebug($"GetScheduleByTeacher id = {id}");
+            return scheduleRepository.GetByTeacher(id);
         }
 
         public async Task<Model.Schedule?> GetSchedule(

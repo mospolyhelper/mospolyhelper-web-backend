@@ -16,6 +16,7 @@ namespace Mospolyhelper.Data.Schedule.Api
             UrlBase + Secrets.URL_SCHEDULE_ALL;
         private readonly string UrlGetAllSchedulesSession = 
             UrlBase + Secrets.URL_SCHEDULE_SESSION_ALL;
+        private const string UrlGetScheduleByTeacher = "https://kaf.dmami.ru/lessons/teacher-html";
 
         private readonly ILogger logger;
         private readonly HttpClient client;
@@ -56,6 +57,29 @@ namespace Mospolyhelper.Data.Schedule.Api
             var request = new HttpRequestMessage
             {
                 RequestUri = new Uri(isSession ? UrlGetAllSchedulesSession : UrlGetAllSchedules),
+                Method = HttpMethod.Get,
+                Headers =
+                {
+                    { nameof(HttpRequestHeader.Referer), UrlBase },
+                    { "X-Requested-With", "XMLHttpRequest" }
+                }
+            };
+            var response = await client.SendAsync(request);
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        public async Task<string> GetScheduleByTeacher(string teacherId)
+        {
+            this.logger.LogDebug($"GetScheduleByTeacher teacherId = {teacherId}");
+            var builder = new UriBuilder(UrlGetScheduleByTeacher);
+            var query = HttpUtility.ParseQueryString(builder.Query);
+            query["id"] = teacherId;
+            builder.Query = query.ToString();
+            var url = builder.Uri;
+            var request = new HttpRequestMessage
+            {
+                RequestUri = url,
                 Method = HttpMethod.Get,
                 Headers =
                 {
