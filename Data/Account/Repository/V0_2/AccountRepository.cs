@@ -1,10 +1,10 @@
 ﻿namespace Mospolyhelper.Data.Account.Repository.V0_2
 {
     using Microsoft.Extensions.Logging;
-    using Mospolyhelper.Data.Account.Remote.V0_2;
-    using Mospolyhelper.Domain.Account.Model.V0_2;
-    using Mospolyhelper.Domain.Account.Repository.V0_2;
-    using Mospolyhelper.Utils;
+    using Data.Account.Remote.V0_2;
+    using Domain.Account.Model.V0_2;
+    using Domain.Account.Repository.V0_2;
+    using Utils;
     using System.Threading.Tasks;
 
     public class AccountRepository : IAccountRepository

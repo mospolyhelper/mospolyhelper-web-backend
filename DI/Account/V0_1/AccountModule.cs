@@ -1,19 +1,22 @@
-﻿namespace Mospolyhelper.DI.V0_2
+﻿namespace Mospolyhelper.DI.Account.V0_1
 {
     using Common;
+    using Data.Account.Api.V0_1;
+    using Data.Account.Converters.V0_1;
+    using Data.Account.Remote.V0_1;
+    using Data.Account.Repository.V0_1;
+    using Domain.Account.Repository;
+    using Domain.Account.Repository.V0_1;
+    using Domain.Account.UseCase;
+    using Domain.Account.UseCase.V0_1;
     using Microsoft.Extensions.DependencyInjection;
-    using Data.Account.Converters.V0_2;
-    using Data.Account.Remote.V0_2;
-    using Data.Account.Repository.V0_2;
-    using Domain.Account.Repository.V0_2;
-    using Domain.Account.UseCase.V0_2;
 
     public class AccountModule : IModule
     {
         public void Load(IServiceCollection services)
         {
             // Apis
-            //services.AddSingleton<AccountClient>();
+            services.AddSingleton<AccountClient>();
 
 
             // Converters

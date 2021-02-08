@@ -123,7 +123,7 @@ namespace Mospolyhelper.Utils
     {
         public static Loading Value = new Loading();
     }
-    static class ResultExt
+    public static class ResultExt
     {
         /**
          * Creates an instance of internal marker [Result.Failure] class to
@@ -147,19 +147,21 @@ namespace Mospolyhelper.Utils
         //    if (value is Result.Failure) throw value.exception
         //}
 
-        ///**
-        // * Calls the specified function [block] and returns its encapsulated result if invocation was successful,
-        // * catching any [Throwable] exception that was thrown from the [block] function execution and encapsulating it as a failure.
-        // */
-        //public inline fun<R> runCatching(block: ()->R): Result<R> {
-        //    return try
-        //    {
-        //        Result.success(block())
-        //    }
-        //    catch (e: Throwable) {
-        //        Result.failure(e)
-        //    }
-        //    }
+        /**
+         * Calls the specified function [block] and returns its encapsulated result if invocation was successful,
+         * catching any [Throwable] exception that was thrown from the [block] function execution and encapsulating it as a failure.
+         */
+        public static Result<R> RunCatching<R>(Func<R> block) where R : class
+        {
+            try
+            {
+                return Result<R>.Success(block());
+            }
+            catch (Exception e)
+            {
+                return Result<R>.Failure(e);
+            }
+        }
 
         //    /**
         //     * Calls the specified function [block] with `this` value as its receiver and returns its encapsulated result if invocation was successful,
@@ -218,106 +220,102 @@ namespace Mospolyhelper.Utils
             return result.Value as T;
         }
 
-    //        /**
-    //         * Returns the result of [onSuccess] for the encapsulated value if this instance represents [success][Result.isSuccess]
-    //         * or the result of [onFailure] function for the encapsulated [Throwable] exception if it is [failure][Result.isFailure].
-    //         *
-    //         * Note, that this function rethrows any [Throwable] exception thrown by [onSuccess] or by [onFailure] function.
-    //         */
-    //inline fun<R, T> Result<T>.fold(
-    //onSuccess: (value: T)->R,
-    //    onFailure: (exception: Throwable)->R,
-    //    onLoading: ()->R
-    //): R {
-    //            contract {
-    //                callsInPlace(onSuccess, InvocationKind.AT_MOST_ONCE)
-    //                callsInPlace(onFailure, InvocationKind.AT_MOST_ONCE)
-    //                callsInPlace(onLoading, InvocationKind.AT_MOST_ONCE)
-    //            }
-    //            val exception = exceptionOrNull()
-    //    return when {
-    //                exception == null && isLoading->onLoading()
-    //        exception == null->onSuccess(value as T)
-    //        else ->onFailure(exception)
-    //    }
-    //        }
+        //        /**
+        //         * Returns the result of [onSuccess] for the encapsulated value if this instance represents [success][Result.isSuccess]
+        //         * or the result of [onFailure] function for the encapsulated [Throwable] exception if it is [failure][Result.isFailure].
+        //         *
+        //         * Note, that this function rethrows any [Throwable] exception thrown by [onSuccess] or by [onFailure] function.
+        //         */
+        //inline fun<R, T> Result<T>.fold(
+        //onSuccess: (value: T)->R,
+        //    onFailure: (exception: Throwable)->R,
+        //    onLoading: ()->R
+        //): R {
+        //            contract {
+        //                callsInPlace(onSuccess, InvocationKind.AT_MOST_ONCE)
+        //                callsInPlace(onFailure, InvocationKind.AT_MOST_ONCE)
+        //                callsInPlace(onLoading, InvocationKind.AT_MOST_ONCE)
+        //            }
+        //            val exception = exceptionOrNull()
+        //    return when {
+        //                exception == null && isLoading->onLoading()
+        //        exception == null->onSuccess(value as T)
+        //        else ->onFailure(exception)
+        //    }
+        //        }
 
-    //        // transformation
+        //        // transformation
 
-    //        /**
-    //         * Returns the encapsulated result of the given [transform] function applied to the encapsulated value
-    //         * if this instance represents [success][Result.isSuccess] or the
-    //         * original encapsulated [Throwable] exception if it is [failure][Result.isFailure].
-    //         *
-    //         * Note, that this function rethrows any [Throwable] exception thrown by [transform] function.
-    //         * See [mapCatching] for an alternative that encapsulates exceptions.
-    //         */
-    //inline fun<R, T> Result<T>.map(transform: (value: T)->R): Result<R> {
-    //            contract {
-    //                callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
-    //            }
-    //            return when {
-    //                isSuccess->Result.success(transform(value as T))
-    //        else ->Result(value)
-    //            }
-    //        }
+        /**
+         * Returns the encapsulated result of the given [transform] function applied to the encapsulated value
+         * if this instance represents [success][Result.isSuccess] or the
+         * original encapsulated [Throwable] exception if it is [failure][Result.isFailure].
+         *
+         * Note, that this function rethrows any [Throwable] exception thrown by [transform] function.
+         * See [mapCatching] for an alternative that encapsulates exceptions.
+         */
+        public static Result<R> Map<T, R>(this Result<T> result, Func<T, R> transform)
+            where T : class where R : class
+        {
+            return result.IsSuccess ? Result<R>.Success(transform(result.Value as T)) : new Result<R>(result.Value);
+        }
 
-    //        /**
-    //         * Returns the encapsulated result of the given [transform] function applied to the encapsulated value
-    //         * if this instance represents [success][Result.isSuccess] or the
-    //         * original encapsulated [Throwable] exception if it is [failure][Result.isFailure].
-    //         *
-    //         * This function catches any [Throwable] exception thrown by [transform] function and encapsulates it as a failure.
-    //         * See [map] for an alternative that rethrows exceptions from `transform` function.
-    //         */
-    //public inline fun<R, T> Result<T>.mapCatching(transform: (value: T)->R): Result<R> {
-    //            return when {
-    //                isSuccess->runCatching { transform(value as T) }
-    //        else ->Result(value)
-    //            }
-    //        }
-
-    //        /**
-    //         * Returns the encapsulated result of the given [transform] function applied to the encapsulated [Throwable] exception
-    //         * if this instance represents [failure][Result.isFailure] or the
-    //         * original encapsulated value if it is [success][Result.isSuccess].
-    //         *
-    //         * Note, that this function rethrows any [Throwable] exception thrown by [transform] function.
-    //         * See [recoverCatching] for an alternative that encapsulates exceptions.
-    //         */
-    //inline fun<R, T : R > Result<T>.recover(transform: (exception: Throwable)->R): Result<R> {
-    //            contract {
-    //                callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
-    //            }
-    //            return when(val exception = exceptionOrNull()) {
-    //                null-> this
-    //        else ->Result.success(transform(exception))
-    //           }
-    //        }
-
-    //        /**
-    //         * Returns the encapsulated result of the given [transform] function applied to the encapsulated [Throwable] exception
-    //         * if this instance represents [failure][Result.isFailure] or the
-    //         * original encapsulated value if it is [success][Result.isSuccess].
-    //         *
-    //         * This function catches any [Throwable] exception thrown by [transform] function and encapsulates it as a failure.
-    //         * See [recover] for an alternative that rethrows exceptions.
-    //         */
-    //public inline fun<R, T : R > Result<T>.recoverCatching(transform: (exception: Throwable)->R): Result<R> {
-    //            val value = value // workaround for inline classes BE bug
-    //    return when(val exception = exceptionOrNull()) {
-    //                null-> this
-    //        else ->runCatching { transform(exception) }
-    //            }
-    //        }
-
-    //        // "peek" onto value/exception and pipe
-
-    /**
-     * Performs the given [action] on the encapsulated [Throwable] exception if this instance represents [failure][Result.isFailure].
-     * Returns the original `Result` unchanged.
+        /**
+     * Returns the encapsulated result of the given [transform] function applied to the encapsulated value
+     * if this instance represents [success][Result.isSuccess] or the
+     * original encapsulated [Throwable] exception if it is [failure][Result.isFailure].
+     *
+     * This function catches any [Throwable] exception thrown by [transform] function and encapsulates it as a failure.
+     * See [map] for an alternative that rethrows exceptions from `transform` function.
      */
-    public static Result<T> OnFailure<T>(this Result<T> result, Action<Exception> action) where T : class
+        public static Result<R> MapCatching<T, R>(this Result<T> result, Func<T, R> transform)
+            where T : class where R : class
+        {
+            return result.IsSuccess ? RunCatching(() => transform(result.Value as T)) : 
+                new Result<R>(result.Value);
+        }
+
+        //        /**
+        //         * Returns the encapsulated result of the given [transform] function applied to the encapsulated [Throwable] exception
+        //         * if this instance represents [failure][Result.isFailure] or the
+        //         * original encapsulated value if it is [success][Result.isSuccess].
+        //         *
+        //         * Note, that this function rethrows any [Throwable] exception thrown by [transform] function.
+        //         * See [recoverCatching] for an alternative that encapsulates exceptions.
+        //         */
+        //inline fun<R, T : R > Result<T>.recover(transform: (exception: Throwable)->R): Result<R> {
+        //            contract {
+        //                callsInPlace(transform, InvocationKind.AT_MOST_ONCE)
+        //            }
+        //            return when(val exception = exceptionOrNull()) {
+        //                null-> this
+        //        else ->Result.success(transform(exception))
+        //           }
+        //        }
+
+        //        /**
+        //         * Returns the encapsulated result of the given [transform] function applied to the encapsulated [Throwable] exception
+        //         * if this instance represents [failure][Result.isFailure] or the
+        //         * original encapsulated value if it is [success][Result.isSuccess].
+        //         *
+        //         * This function catches any [Throwable] exception thrown by [transform] function and encapsulates it as a failure.
+        //         * See [recover] for an alternative that rethrows exceptions.
+        //         */
+        //public inline fun<R, T : R > Result<T>.recoverCatching(transform: (exception: Throwable)->R): Result<R> {
+        //            val value = value // workaround for inline classes BE bug
+        //    return when(val exception = exceptionOrNull()) {
+        //                null-> this
+        //        else ->runCatching { transform(exception) }
+        //            }
+        //        }
+
+        //        // "peek" onto value/exception and pipe
+
+        /**
+         * Performs the given [action] on the encapsulated [Throwable] exception if this instance represents [failure][Result.isFailure].
+         * Returns the original `Result` unchanged.
+         */
+        public static Result<T> OnFailure<T>(this Result<T> result, Action<Exception> action) where T : class
         {
             var e = result.ExceptionOrNull();
             if (e != null)
