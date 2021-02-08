@@ -1,13 +1,11 @@
 ﻿namespace Mospolyhelper.Data.Account.Remote.V0_2
 {
+    using Api.V0_1;
     using Microsoft.Extensions.Logging;
-    using Mospolyhelper.Data.Account.Api;
-    using Mospolyhelper.Data.Account.Converters.V0_2;
-    using Mospolyhelper.Domain.Account.Model.V0_2;
-    using Mospolyhelper.Utils;
+    using Converters.V0_2;
+    using Domain.Account.Model.V0_2;
+    using Utils;
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
 
     public class AccountRemoteDataSource

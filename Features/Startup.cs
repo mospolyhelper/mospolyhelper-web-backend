@@ -16,6 +16,12 @@ using Mospolyhelper.DI.Common;
 
 namespace Mospolyhelper
 {
+    using DI.Account.V0_1;
+    using DI.Core.V0_1;
+    using DI.Map.V0_1;
+    using DI.Schedule.V0_1;
+    using Utils;
+
     public class SlugifyParameterTransformer : IOutboundParameterTransformer
     {
         public string? TransformOutbound(object value)
@@ -113,7 +119,7 @@ namespace Mospolyhelper
                     ValidateIssuerSigningKey = true,
                     //ValidIssuer = Configuration["Jwt:Issuer"],
                     //ValidAudience = Configuration["Jwt:Issuer"],
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("mysupersecret_secretqqq!123")) //Configuration["JwtToken:SecretKey"]  
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Secrets.AuthJwtKey)) //Configuration["JwtToken:SecretKey"]  
                 };
             });
 
@@ -135,11 +141,11 @@ namespace Mospolyhelper
             });
 
             services
-                .RegisterModule(new DI.CoreModule())
-                .RegisterModule(new DI.ScheduleModule())
-                .RegisterModule(new DI.AccountModule())
+                .RegisterModule(new CoreModule())
+                .RegisterModule(new ScheduleModule())
+                .RegisterModule(new AccountModule())
                 .RegisterModule(new DI.V0_2.AccountModule())
-                .RegisterModule(new DI.MapModule());
+                .RegisterModule(new MapModule());
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
