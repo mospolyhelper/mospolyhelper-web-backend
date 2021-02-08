@@ -8,19 +8,19 @@ namespace Mospolyhelper.Domain.Schedule.Model
     {
         public static Schedule From(IList<IList<Lesson>> dailySchedules)
         {
-            var dateFrom = DateTime.MinValue;
-            var dateTo = DateTime.MaxValue;
+            var dateFrom = DateTime.MaxValue;
+            var dateTo = DateTime.MinValue;
 
             foreach (var dailySchedule in dailySchedules)
             {
                 foreach (var lesson in dailySchedule)
                 {
-                    if (dateFrom < lesson.DateFrom)
+                    if (lesson.DateFrom < dateFrom)
                     {
                         dateFrom = lesson.DateFrom;
                     }
 
-                    if (dateTo > lesson.DateTo)
+                    if (lesson.DateTo > dateTo)
                     {
                         dateTo = lesson.DateTo;
                     }
@@ -183,25 +183,54 @@ namespace Mospolyhelper.Domain.Schedule.Model
                 var dayNew = tempListNew[i];
                 foreach (var lesson in day)
                 {
-                    var index = -1;
+                    var indexGroup = -1;
+                    var indexTeacher = -1;
                     for (var j = 0; j < dayNew.Count; j++)
                     {
-                        if (isEqualForGroups(lesson, dayNew[j]))
+                        var l = dayNew[j];
+                        if (CanMergeByGroup(lesson, dayNew[j]))
                         {
-                            index = j;
+                            indexGroup = j;
+                            break;
+                        }
+                        if (CanMergeByTeacher(lesson, dayNew[j]))
+                        {
+                            indexTeacher = j;
                             break;
                         }
                     }
-                    if (index == -1)
+                    if (indexGroup == -1)
                     {
-                        dayNew.Add(lesson);
+                        if (indexTeacher == -1)
+                        {
+                            dayNew.Add(lesson);
+                        }
+                        else
+                        {
+                            var lessonEqualForTeacher = dayNew[indexTeacher];
+                            var newTeachers = lessonEqualForTeacher.Teachers.ToList();
+                            newTeachers.AddRange(lesson.Teachers);
+                            newTeachers.Sort((o1, o2) => o1.FullName.CompareTo(o2.FullName));
+                            dayNew[indexTeacher] = new Lesson(
+                                lesson.Order,
+                                lesson.Title,
+                                lesson.Type,
+                                newTeachers,
+                                lesson.Auditoriums,
+                                lesson.Groups,
+                                lesson.DateFrom,
+                                lesson.DateTo
+                            );
+                        }
                     }
                     else
                     {
-                        var lessonEqualForGroups = dayNew[index];
+                        var lessonEqualForGroups = dayNew[indexGroup];
                         var newGroups = lessonEqualForGroups.Groups.ToList();
                         newGroups.AddRange(lesson.Groups);
-                        dayNew[index] = new Lesson(
+                        // TODO: Make by title and evening
+                        newGroups.Sort((o1, o2) => o1.Title.CompareTo(o2.Title));
+                        dayNew[indexGroup] = new Lesson(
                             lesson.Order,
                             lesson.Title,
                             lesson.Type,
@@ -218,7 +247,7 @@ namespace Mospolyhelper.Domain.Schedule.Model
             return Schedule.From(tempListNew);
         }
 
-        private static bool isEqualForGroups(Lesson l1, Lesson l2)
+        private static bool CanMergeByGroup(Lesson l1, Lesson l2)
         {
             return l1.Order == l2.Order &&
                    l1.Title == l2.Title &&
@@ -228,7 +257,17 @@ namespace Mospolyhelper.Domain.Schedule.Model
                    l1.DateTo == l2.DateTo;
         }
 
-    public static Schedule Filter(
+        private static bool CanMergeByTeacher(Lesson l1, Lesson l2)
+        {
+            return l1.Order == l2.Order &&
+                   l1.Title == l2.Title &&
+                   l1.Auditoriums.SequenceEqual(l2.Auditoriums) &&
+                   l1.Groups.SequenceEqual(l2.Groups) &&
+                   l1.DateFrom == l2.DateFrom &&
+                   l1.DateTo == l2.DateTo;
+        }
+
+        public static Schedule Filter(
             this Schedule schedule,
             IEnumerable<string>? titles = null,
             IEnumerable<string>? types = null,

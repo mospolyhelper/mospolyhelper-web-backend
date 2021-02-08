@@ -20,10 +20,12 @@
 
             // Converters
             services.AddSingleton<ScheduleRemoteConverter>();
+            services.AddSingleton<ScheduleTeacherRemoteConverter>();
 
 
             // DataSources
             services.AddSingleton<ScheduleRemoteDataSource>();
+            services.AddSingleton<ScheduleTeacherRemoteDataSource>();
             services.AddSingleton<ScheduleLocalDataSource>();
 
 

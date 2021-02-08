@@ -50,6 +50,13 @@ namespace Mospolyhelper.Features.Controllers.Schedule
             return Ok(await useCase.GetSchedule(id));
         }
 
+        [HttpGet("schedule-teacher")]
+        public async Task<ActionResult<Domain.Schedule.Model.Schedule?>> GetByTeacher([FromQuery] string id)
+        {
+            this.logger.LogInformation($"GetByTeacher request /schedule/schedule-teacher id={id}");
+            return Ok(await useCase.GetScheduleByTeacher(id));
+        }
+
 
         [HttpPost("schedule")]
         public async Task<ActionResult<Domain.Schedule.Model.Schedule?>> GetFilteredSchedule(

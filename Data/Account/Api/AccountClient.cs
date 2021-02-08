@@ -96,7 +96,7 @@ namespace Mospolyhelper.Data.Account.Api
             return content;
         }
 
-        public async Task<string> GetSessionId(string login, string password, string? sessionId = null)
+        public async Task<(string, string)> GetSessionId(string login, string password, string? sessionId = null)
         {
             this.logger.LogDebug("GetSessionId");
             var postData = new NameValueCollection()
@@ -113,12 +113,7 @@ namespace Mospolyhelper.Data.Account.Api
             response.EnsureSuccessStatusCode();
             var resString = await response.Content.ReadAsStringAsync();
             var resSessionId = GetCookie(response) ?? sessionId ?? string.Empty;
-            if (resString.Contains("upassword"))
-            {
-                Console.WriteLine("Ответ на авторизацию содержит upassword");
-                throw new UnauthorizedAccessException();
-            }
-            return resSessionId;
+            return (resSessionId, resString);
         }
 
         private string? GetCookie(HttpResponseMessage message)
