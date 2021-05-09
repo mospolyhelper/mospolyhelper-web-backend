@@ -46,6 +46,7 @@
             this.logger.LogDebug("GetAllSchedules");
             if (localDataSource.IsRequiredUpdate)
             {
+                //localDataSource.Schedules = await GetAllByTeacher();
                 localDataSource.Schedules = (await remoteDataSource.GetAll(false))
                     .Union(await remoteDataSource.GetAll(true));
             }
@@ -60,9 +61,9 @@
 
         public async Task<IEnumerable<Schedule>> GetAllByTeacher()
         {
-            this.logger.LogDebug($"GetAllByTeacher");
+            this.logger.LogDebug("GetAllByTeacher");
             var resList = new List<Schedule?>();
-            for (var i = 0; i < 3245; i++)
+            for (var i = 0; i < 3256; i++)
             {
                 Console.WriteLine(i);
                 var schedule = await teacherRemoteDataSource.Get(i.ToString());

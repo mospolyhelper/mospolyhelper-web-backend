@@ -40,13 +40,15 @@
             });
         }
 
-        public async Task<Result<string>> Refresh(string refreshToken, string sessionId)
+        public async Task<Result<string>> Refresh(string refreshToken, string jwtToken)
         {
             this.logger.LogDebug("Refresh");
             AuthRequest authRequest;
+            string sessionId;
             try
             {
                 authRequest = DecryptRefreshToken(refreshToken);
+                sessionId = ReadJSONWebToken(jwtToken);
             }
             catch (Exception e)
             {
@@ -108,6 +110,12 @@
 
             var token = new JwtSecurityToken(header, payload);
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        private string ReadJSONWebToken(string jwtToken)
+        {
+            var token = new JwtSecurityTokenHandler().ReadJwtToken(jwtToken);
+            return token.Payload["sessionId"] as string ?? string.Empty;
         }
     }
 }

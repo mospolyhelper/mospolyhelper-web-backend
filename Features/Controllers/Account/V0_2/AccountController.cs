@@ -52,20 +52,13 @@
             return StatusCode(500);
         }
 
-        [Authorize]
         [HttpPost("refresh")]
         public async Task<ActionResult<string>> Refresh(
-            [FromBody] string refreshToken
+            [FromBody] RefreshRequest refreshRequest
             )
         {
             this.logger.LogInformation("POST request /account/refresh");
-            var sessionId = User.Claims.FirstOrDefault(it => it.Type == "sessionId")?.Value;
-
-            if (sessionId == null)
-            {
-                return Unauthorized();
-            }
-            var res = await useCase.Refresh(refreshToken, sessionId);
+            var res = await useCase.Refresh(refreshRequest.RefreshToken, refreshRequest.ExpiredAccessToken);
             if (res.IsSuccess)
             {
                 return Ok(res.GetOrNull());
