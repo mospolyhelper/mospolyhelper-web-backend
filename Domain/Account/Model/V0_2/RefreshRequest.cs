@@ -2,13 +2,7 @@
 {
     public class RefreshRequest
     {
-        public RefreshRequest(string expiredAccessToken, string refreshToken)
-        {
-            ExpiredAccessToken = expiredAccessToken;
-            RefreshToken = refreshToken;
-        }
-
-        public string ExpiredAccessToken { get; }
-        public string RefreshToken { get; }
+        public string ExpiredAccessToken { get; set; }
+        public string RefreshToken { get; set; }
     }
 }
