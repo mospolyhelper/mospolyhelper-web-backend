@@ -12,7 +12,9 @@
             string studentCode, 
             string faculty, 
             string course, 
-            string group, 
+            string group,
+            string dormitory,
+            string dormitoryRoom,
             string direction, 
             string specialization, 
             string educationPeriod, 
@@ -31,6 +33,8 @@
             Faculty = faculty;
             Course = course;
             Group = group;
+            Dormitory = dormitory;
+            DormitoryRoom = dormitoryRoom;
             Direction = direction;
             Specialization = specialization;
             EducationPeriod = educationPeriod;
@@ -49,6 +53,8 @@
         public string Faculty { get; }
         public string Course { get; }
         public string Group { get; }
+        public string Dormitory { get; }
+        public string DormitoryRoom { get; }
         public string Direction { get; }
         public string Specialization { get; }
         public string EducationPeriod { get; }

@@ -42,10 +42,10 @@
                 .Max(it => it!.Value);
             
 
-            var portfolioList = doc.DocumentNode.Descendants("td")
+            var portfolioList = doc.DocumentNode.Descendants("tr")
                 .Where(it =>
                     it.InnerText.Contains("Группа", StringComparison.InvariantCultureIgnoreCase)
-                ).Select(it => ParsePortfolio(it.Descendants("div")))
+                ).Select(it => ParsePortfolio(it))
                 .ToList();
 
             return new Students(
@@ -55,9 +55,16 @@
                 );
         }
 
-        private Portfolio ParsePortfolio(IEnumerable<HtmlNode> portfolio)
+        private Portfolio ParsePortfolio(HtmlNode portfolioTable)
         {
             this.logger.LogDebug("ParsePortfolio");
+
+            var tds = portfolioTable.Descendants("td").GetEnumerator();
+            tds.MoveNext();
+            var imageUrl = tds.Current.Descendants("img").FirstOrDefault()
+                ?.GetAttributeValue("src", "img/no_avatar.jpg") ?? "img/no_avatar.jpg";
+            tds.MoveNext();
+            var portfolio = tds.Current.Descendants("div");
             var id = int.Parse(
                 portfolio.FirstOrDefault()?
                 .GetAttributeValue("id", "myModal_-1")
@@ -66,7 +73,7 @@
                 );
             var name = portfolio.FirstOrDefault()?.Descendants("h4")?.FirstOrDefault()?.InnerText ?? string.Empty;
             var body = portfolio.ElementAtOrDefault(1)?.InnerHtml ?? string.Empty;
-            var group = new Regex("Группа: <b>(.+?)<\\/b><br")
+            var group = new Regex(@"Группа: <b>(.+?)<\/b><br")
                 .Match(body).Groups[1].Value.Trim();
             var direction = new Regex("Направление подготовки \\(специальность\\): <b>(.+?)<\\/b><br")
                 .Match(body).Groups[1].Value.Trim();
@@ -80,12 +87,13 @@
             return new Portfolio(
                 id,
                 name,
+                imageUrl,
                 group,
                 direction,
                 specialization,
                 course,
                 educationForm
-                );
+            );
         }
 
         public AccountTeachers ParseTeachers(string teachers, int page)
@@ -244,8 +252,12 @@
                     .Match(content).Groups[1].Value;
                 var course = new Regex("Курс: <b>(.+?)<\\/b><br")
                     .Match(content).Groups[1].Value;
-                var group = new Regex("Группа: <b><a.*?>(.+?)<\\/a><\\/b><br")
+                var group = new Regex(@"Группа: <b><a.*?>(.+?)<\/a><\/b><br")
                     .Match(content).Groups[1].Value;
+                var dormitoryAndRoom = new Regex(@"Общежитие: № <b>(.*?)</b>, комната <b>(.*?)</b><br>")
+                    .Match(content);
+                var dormitory = dormitoryAndRoom.Groups.Count > 1 ? dormitoryAndRoom.Groups[1].Value : string.Empty;
+                var dormitoryRoom = dormitoryAndRoom.Groups.Count > 2 ? dormitoryAndRoom.Groups[2].Value : string.Empty;
                 var direction = new Regex("Специальность: <b>(.+?)<\\/b><br")
                     .Match(content).Groups[1].Value;
                 var specialization = new Regex("Специализация: <b>(.+?)<\\/b><br")
@@ -279,6 +291,8 @@
                     faculty,
                     course,
                     group,
+                    dormitory,
+                    dormitoryRoom,
                     direction,
                     specialization,
                     educationPeriod,
