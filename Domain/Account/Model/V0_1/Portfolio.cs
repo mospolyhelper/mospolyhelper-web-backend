@@ -4,16 +4,18 @@
     {
         public Portfolio(
             int id,
-            string name, 
+            string name,
+            string avatarUrl,
             string group, 
             string direction, 
             string specialization, 
             string course, 
             string educationForm
-            )
+        )
         {
             Id = id;
             Name = name;
+            AvatarUrl = avatarUrl;
             Group = group;
             Direction = direction;
             Specialization = specialization;
@@ -23,6 +25,7 @@
 
         public int Id { get; }
         public string Name { get; }
+        public string AvatarUrl { get; }
         public string Group { get; }
         public string Direction { get; }
         public string Specialization { get; }
