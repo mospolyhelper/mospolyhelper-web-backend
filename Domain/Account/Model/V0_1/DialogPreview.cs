@@ -12,6 +12,7 @@
             string date,
             string senderImageUrl,
             string senderName,
+            string senderGroup,
             bool hasAttachments, 
             bool hasRead)
         {
@@ -24,6 +25,7 @@
             Date = date;
             SenderImageUrl = senderImageUrl;
             SenderName = senderName;
+            SenderGroup = senderGroup;
             HasAttachments = hasAttachments;
             HasRead = hasRead;
         }
@@ -37,6 +39,7 @@
         public string Date { get; }
         public string SenderImageUrl { get; }
         public string SenderName { get; }
+        public string SenderGroup { get; }
         public bool HasAttachments { get;  }
         public bool HasRead { get; }
 

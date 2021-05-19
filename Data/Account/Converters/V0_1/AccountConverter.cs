@@ -689,8 +689,10 @@
                 tds.MoveNext();
                 var senderImageUrl = tds.Current.Descendants("img").FirstOrDefault()
                     ?.GetAttributeValue("src", "img/no_avatar.jpg") ?? "";
-                var senderName = tds.Current.Descendants("img").FirstOrDefault()
-                    ?.GetAttributeValue("title", "") ?? "";
+
+                var senderBlock = tds.Current.Descendants("b").FirstOrDefault();
+                var senderName = senderBlock?.Descendants("b")?.FirstOrDefault()?.InnerText?.Trim() ?? string.Empty;
+                var senderGroup = senderBlock?.Descendants("font")?.FirstOrDefault()?.InnerText?.Trim() ?? string.Empty;
                 var date = tds.Current.Descendants("font").LastOrDefault()?.InnerText ?? string.Empty;
                 var message = tds.Current.InnerHtml.Split("<br>").LastOrDefault()?.Trim() ?? string.Empty;
                 tds.MoveNext();
@@ -708,6 +710,7 @@
                         date,
                         senderImageUrl,
                         senderName,
+                        senderGroup,
                         hasAttachments,
                         hasRead
                         )
