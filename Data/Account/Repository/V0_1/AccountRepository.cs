@@ -118,5 +118,14 @@
             this.logger.LogDebug("SendMessage");
             return this.remoteDataSource.SendMessage(sessionId, dialogKey, message, fileNames);
         }
+
+        public Task<Result<IList<AccountMessage>>> RemoveMessage(
+            string sessionId,
+            string dialogAndMessage
+        )
+        {
+            this.logger.LogDebug("RemoveMessage");
+            return this.remoteDataSource.RemoveMessage(sessionId, dialogAndMessage);
+        }
     }
 }
