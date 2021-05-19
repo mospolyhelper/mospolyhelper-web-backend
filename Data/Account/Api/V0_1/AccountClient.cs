@@ -275,6 +275,22 @@
             return GetResponseString(url, HttpMethod.Post, sessionId, content);
         }
 
+        public Task<string> RemoveMessage(string sessionId, string dialogAndMessage)
+        {
+            this.logger.LogDebug("RemoveMessage");
+            var builder = new UriBuilder(UrlMessages);
+            var query = HttpUtility.ParseQueryString(builder.Query);
+            var dialogKeyAndMessageParams = dialogAndMessage.Split("&m=");
+            if (dialogKeyAndMessageParams.Length > 1)
+            {
+                query["dlg"] = dialogKeyAndMessageParams[0];
+                query["m"] = dialogKeyAndMessageParams[1];
+            }
+            builder.Query = query.ToString();
+            var url = builder.Uri;
+            return GetResponseString(url, HttpMethod.Get, sessionId);
+        }
+
         public Task<string> GetMyPortfolio(string sessionId)
         {
             this.logger.LogDebug("GetMyPortfolio");

@@ -41,5 +41,10 @@
             string message,
             IList<string> fileNames
             );
+
+        public Task<Result<IList<AccountMessage>>> RemoveMessage(
+            string sessionId,
+            string dialogAndMessage
+        );
     }
 }

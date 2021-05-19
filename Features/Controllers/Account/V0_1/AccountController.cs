@@ -38,7 +38,7 @@
             public bool IsPublic { get; set; } = false;
         }
 
-        public class MessageQuery
+        public class SendMessageRequest
         {
             public string DialogKey { get; set; }
             public string Message { get; set; }
@@ -352,7 +352,7 @@
 
         [HttpPost("message")]
         public async Task<ActionResult<IList<AccountMessage>>> SendMessage(
-            [FromBody] MessageQuery message,
+            [FromBody] SendMessageRequest sendMessage,
             [FromHeader] string? sessionId = ""
             )
         {
@@ -361,7 +361,34 @@
             {
                 return Unauthorized();
             }
-            var res = await useCase.SendMessage(sessionId, message.DialogKey, message.Message, message.FileNames);
+            var res = await useCase.SendMessage(sessionId, sendMessage.DialogKey, sendMessage.Message, sendMessage.FileNames);
+            if (res.IsSuccess)
+            {
+                return Ok(res.GetOrNull());
+            }
+            else if (res.IsFailure)
+            {
+                return (res.ExceptionOrNull()) switch
+                {
+                    UnauthorizedAccessException e => Unauthorized(),
+                    _ => StatusCode(500),
+                };
+            }
+            return StatusCode(500);
+        }
+
+        [HttpDelete("message")]
+        public async Task<ActionResult<IList<AccountMessage>>> RemoveMessage(
+            [FromQuery] string removeKey,
+            [FromHeader] string? sessionId = ""
+        )
+        {
+            this.logger.LogInformation("DELETE request /account/message");
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Unauthorized();
+            }
+            var res = await useCase.RemoveMessage(sessionId, removeKey);
             if (res.IsSuccess)
             {
                 return Ok(res.GetOrNull());

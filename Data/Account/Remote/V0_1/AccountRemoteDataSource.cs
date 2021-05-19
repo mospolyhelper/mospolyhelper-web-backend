@@ -331,5 +331,28 @@
                 return Result<IList<AccountMessage>>.Failure(e);
             }
         }
+
+        public async Task<Result<IList<AccountMessage>>> RemoveMessage(
+            string sessionId,
+            string dialogAndMessage
+        )
+        {
+            this.logger.LogDebug("RemoveMessage");
+            try
+            {
+                var res = await this.client.RemoveMessage(sessionId, dialogAndMessage);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<IList<AccountMessage>>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<IList<AccountMessage>>.Success(converter.ParseDialog(res));
+            }
+            catch (Exception e)
+            {
+                this.logger.LogError(e, "RemoveMessage");
+                return Result<IList<AccountMessage>>.Failure(e);
+            }
+        }
     }
 }

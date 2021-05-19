@@ -115,5 +115,14 @@
             this.logger.LogDebug("SendMessage");
             return this.accountRepository.SendMessage(sessionId, dialogKey, message, fileNames);
         }
+
+        public Task<Result<IList<AccountMessage>>> RemoveMessage(
+            string sessionId,
+            string dialogAndMessage
+        )
+        {
+            this.logger.LogDebug("RemoveMessage");
+            return this.accountRepository.RemoveMessage(sessionId, dialogAndMessage);
+        }
     }
 }
