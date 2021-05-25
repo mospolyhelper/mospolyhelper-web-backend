@@ -693,7 +693,7 @@
                 var senderBlock = tds.Current.Descendants("b").FirstOrDefault();
                 var senderName = senderBlock?.Descendants("b")?.FirstOrDefault()?.InnerText?.Trim() ?? string.Empty;
                 var senderGroup = senderBlock?.Descendants("font")?.FirstOrDefault()?.InnerText?.Trim() ?? string.Empty;
-                var date = tds.Current.Descendants("font").LastOrDefault()?.InnerText ?? string.Empty;
+                var dateTime = tds.Current.Descendants("font").LastOrDefault()?.InnerText ?? string.Empty;
                 var message = tds.Current.InnerHtml.Split("<br>").LastOrDefault()?.Trim() ?? string.Empty;
                 tds.MoveNext();
                 var hasAttachments = tds.Current.InnerHtml.Contains("прикреп", StringComparison.InvariantCultureIgnoreCase);
@@ -707,7 +707,7 @@
                         authorGroup,
                         imageUrl,
                         message,
-                        date,
+                        dateTime,
                         senderImageUrl,
                         senderName,
                         senderGroup,
@@ -760,13 +760,13 @@
                     ?.Select(it => 
                     {
                         var url = it.GetAttributeValue("href", null)?.Split("f=")?.LastOrDefault();
-                        url = HttpUtility.UrlDecode(url);
+                        //url = HttpUtility.UrlDecode(url);
                         var name = it.InnerText;
-                        return new AccountAttachment(url, name);
+                        return new AccountAttachment(url ?? string.Empty, name);
                     })
                     ?.ToList() as IList<AccountAttachment> ?? Array.Empty<AccountAttachment>();
                 tds.MoveNext();
-                var date = tds.Current.Descendants("font").FirstOrDefault()?.InnerText ?? string.Empty;
+                var dateTime = tds.Current.Descendants("font").FirstOrDefault()?.InnerText ?? string.Empty;
                 var removeUrl = (tds.Current.Descendants("a").FirstOrDefault()
                         ?.GetAttributeValue("onclick", string.Empty)
                         .Split("'")).FirstOrDefault(it => it.Contains("&dlg="))
@@ -778,6 +778,7 @@
                         imageUrl,
                         authorName,
                         message,
+                        dateTime,
                         attachments,
                         removeUrl
                         )
