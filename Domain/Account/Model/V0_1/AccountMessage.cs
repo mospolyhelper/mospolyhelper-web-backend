@@ -9,6 +9,7 @@
             string avatarUrl, 
             string authorName, 
             string message,
+            string dateTime,
             IList<AccountAttachment> attachments, 
             string removeUrl
             )
@@ -17,6 +18,7 @@
             AvatarUrl = avatarUrl;
             AuthorName = authorName;
             Message = message;
+            DateTime = dateTime;
             Attachments = attachments;
             RemoveUrl = removeUrl;
         }
@@ -25,6 +27,7 @@
         public string AvatarUrl { get; }
         public string AuthorName { get; }
         public string Message { get; }
+        public string DateTime { get; }
         public IList<AccountAttachment> Attachments { get; }
         public string RemoveUrl { get; }
     }

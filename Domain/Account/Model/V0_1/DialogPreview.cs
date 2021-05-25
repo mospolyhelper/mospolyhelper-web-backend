@@ -9,7 +9,7 @@
             string authorGroup, 
             string avatarUrl, 
             string message, 
-            string date,
+            string dateTime,
             string senderImageUrl,
             string senderName,
             string senderGroup,
@@ -22,7 +22,7 @@
             AuthorGroup = authorGroup;
             AvatarUrl = avatarUrl;
             Message = message;
-            Date = date;
+            DateTime = dateTime;
             SenderImageUrl = senderImageUrl;
             SenderName = senderName;
             SenderGroup = senderGroup;
@@ -36,7 +36,7 @@
         public string AuthorGroup { get; }
         public string AvatarUrl { get; }
         public string Message { get; }
-        public string Date { get; }
+        public string DateTime { get; }
         public string SenderImageUrl { get; }
         public string SenderName { get; }
         public string SenderGroup { get; }
