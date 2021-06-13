@@ -138,7 +138,10 @@
                 {
                     return Result<AccountMarks>.Failure(new UnauthorizedAccessException());
                 }
-                return Result<AccountMarks>.Success(converter.ParseMarks(res));
+                return Result<AccountMarks>.Success(
+                    converter.ParseMarks(res) ?? 
+                    new AccountMarks(new Dictionary<string, IDictionary<string, IList<AccountMark>>>())
+                    );
             }
             catch (Exception e)
             {
@@ -158,7 +161,10 @@
                 {
                     return Result<GradeSheets>.Failure(new UnauthorizedAccessException());
                 }
-                return Result<GradeSheets>.Success(converter.ParseGradeSheets(res));
+                return Result<GradeSheets>.Success(
+                    converter.ParseGradeSheets(res) ??
+                    new GradeSheets("Нет", Array.Empty<string>(), Array.Empty<GradeSheet>())
+                    );
             }
             catch (Exception e)
             {

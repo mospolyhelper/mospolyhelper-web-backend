@@ -429,7 +429,12 @@
                 return Array.Empty<Application>();
             }
             var resList = new List<Application>();
-            var trs = table.Descendants("tr").Skip(1);
+            var trList = table.Descendants("tr").ToList();
+            if (trList.Count == 0)
+            {
+                return Array.Empty<Application>();
+            }
+            var trs = trList.AsEnumerable().Skip(1);
             foreach (var tr in trs)
             {
                 var tds = tr.Descendants("td").GetEnumerator();
