@@ -4,12 +4,15 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
+    using System.Text.Json;
     using System.Text.RegularExpressions;
     using System.Web;
     using HtmlAgilityPack;
     using Microsoft.Extensions.Logging;
     using Domain.Account.Model;
     using Domain.Account.Model.V0_1;
+    using Model;
+    using Students = Domain.Account.Model.V0_1.Students;
 
     public class AccountConverter
     {
@@ -416,6 +419,40 @@
                     ));
             }
             return new GradeSheets(semester, semesterList, sheetList);
+        }
+
+        public IList<GradeSheetMark> ParseGradeSheetMarks(string marks)
+        {
+            this.logger.LogDebug("ParseGradeSheetMarks");
+            var allMarks = JsonSerializer.Deserialize<GradeSheetAllMarksApiModel>(marks);
+            var studentMarks = allMarks.Students;
+            var doc = new HtmlDocument();
+            doc.LoadHtml(studentMarks);
+            var table = doc.DocumentNode.Descendants("table").LastOrDefault();
+            if (table == null)
+            {
+                return Array.Empty<GradeSheetMark>();
+            }
+            var resList = new List<GradeSheetMark>();
+            var trList = table.Descendants("tr").ToList();
+            if (trList.Count == 0)
+            {
+                return Array.Empty<GradeSheetMark>();
+            }
+            var trs = trList.AsEnumerable().Skip(1);
+            foreach (var tr in trs)
+            {
+                var tds = tr.Descendants("td").GetEnumerator();
+                tds.MoveNext();
+                tds.MoveNext();
+                tds.MoveNext();
+                var name = tds.Current.Descendants("label").FirstOrDefault()?.InnerText ?? string.Empty;
+                tds.MoveNext();
+                var mark = tds.Current.Descendants("label").FirstOrDefault()?.InnerText ?? string.Empty;
+                resList.Add(new GradeSheetMark(name, mark));
+            }
+
+            return resList;
         }
 
         public IList<Application> ParseApplications(string application)
