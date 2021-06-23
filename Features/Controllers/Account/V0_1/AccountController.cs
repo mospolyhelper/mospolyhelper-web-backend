@@ -224,12 +224,39 @@
             [FromHeader] string? sessionId = ""
             )
         {
-            this.logger.LogInformation("GET request /account/marks");
+            this.logger.LogInformation("GET request /account/grade-sheets");
             if (string.IsNullOrEmpty(sessionId))
             {
                 return Unauthorized();
             }
             var res = await useCase.GetGradeSheets(sessionId, semester ?? string.Empty);
+            if (res.IsSuccess)
+            {
+                return Ok(res.GetOrNull());
+            }
+            else if (res.IsFailure)
+            {
+                return (res.ExceptionOrNull()) switch
+                {
+                    UnauthorizedAccessException e => Unauthorized(),
+                    _ => StatusCode(500),
+                };
+            }
+            return StatusCode(500);
+        }
+
+        [HttpGet("grade-sheet-marks")]
+        public async Task<ActionResult<IList<GradeSheetMark>>> GetGradeSheetMarks(
+            [FromQuery] string guid = "",
+            [FromHeader] string? sessionId = ""
+        )
+        {
+            this.logger.LogInformation("GET request /account/grade-sheets");
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Unauthorized();
+            }
+            var res = await useCase.GetGradeSheetAllMarks(sessionId, guid);
             if (res.IsSuccess)
             {
                 return Ok(res.GetOrNull());

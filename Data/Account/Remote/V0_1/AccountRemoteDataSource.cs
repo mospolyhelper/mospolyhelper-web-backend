@@ -173,6 +173,49 @@
             }
         }
 
+        public async Task<Result<GradeSheets>> GetGradeSheetInfo(string sessionId, string guid)
+        {
+            this.logger.LogDebug("GetGradeSheetInfo");
+            try
+            {
+                var res = await client.GetGradeSheetInfo(sessionId, guid);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<GradeSheets>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<GradeSheets>.Success(
+                    converter.ParseGradeSheets(res) ??
+                    new GradeSheets("Нет", Array.Empty<string>(), Array.Empty<GradeSheet>())
+                );
+            }
+            catch (Exception e)
+            {
+                this.logger.LogError(e, "GetGradeSheets");
+                return Result<GradeSheets>.Failure(e);
+            }
+        }
+
+        public async Task<Result<IList<GradeSheetMark>>> GetGradeSheetAllMarks(string sessionId, string guid)
+        {
+            this.logger.LogDebug("GetGradeSheetAllMarks");
+            try
+            {
+                var res = await client.GetGradeSheetAllMarks(sessionId, guid);
+                var isAuthorized = CheckAuthorization(res);
+                if (!isAuthorized)
+                {
+                    return Result<IList<GradeSheetMark>>.Failure(new UnauthorizedAccessException());
+                }
+                return Result<IList<GradeSheetMark>>.Success(converter.ParseGradeSheetMarks(res));
+            }
+            catch (Exception e)
+            {
+                this.logger.LogError(e, "GetGradeSheetAllMarks");
+                return Result<IList<GradeSheetMark>>.Failure(e);
+            }
+        }
+
         public async Task<Result<IList<Application>>> GetApplications(string sessionId)
         {
             this.logger.LogDebug("GetApplications");

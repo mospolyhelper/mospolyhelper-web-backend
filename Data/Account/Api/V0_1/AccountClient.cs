@@ -41,6 +41,8 @@
         private const string UrlSchedules = UrlBase + "/?p=rasp";
         private const string UrlMarks = UrlBase + "/?p=marks";
         private const string UrlGradeSheets = UrlBase + "/?p=stud_stats";
+        private const string UrlGradeSheetInfo = UrlBase + "/stats_api.php";
+        private const string UrlGradeSheetMarks = UrlBase + "/stats_api.php";
         private const string UrlProjects = UrlBase + "/?p=projects";
         private const string UrlPhysed = UrlBase + "/?p=phys";
         private const string UrlClassmates = UrlBase + "/?p=group";
@@ -204,6 +206,32 @@
 
                 return GetResponseString(new Uri(UrlGradeSheets), HttpMethod.Post, sessionId, content);
             }
+        }
+
+        public Task<string> GetGradeSheetInfo(string sessionId, string guid)
+        {
+            this.logger.LogDebug("GetGradeSheetInfo");
+            var contentList = new NameValueCollection()
+            {
+                { "act", "showStatDetails" },
+                { "sid", guid }
+            };
+            var content = ToUrlEncodedForm(contentList);
+
+            return GetResponseString(new Uri(UrlGradeSheetInfo), HttpMethod.Post, sessionId, content);
+        }
+
+        public Task<string> GetGradeSheetAllMarks(string sessionId, string guid)
+        {
+            this.logger.LogDebug("GetGradeSheetAllMarks");
+            var contentList = new NameValueCollection
+            {
+                { "act", "getReports" },
+                { "sid", guid }
+            };
+            var content = ToUrlEncodedForm(contentList);
+
+            return GetResponseString(new Uri(UrlGradeSheetMarks), HttpMethod.Post, sessionId, content);
         }
 
         public Task<string> GetApplications(string sessionId)
