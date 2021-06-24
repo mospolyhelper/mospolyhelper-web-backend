@@ -1,7 +1,9 @@
 ﻿namespace Mospolyhelper.Data.Account.Model
 {
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text.Json.Serialization;
+    using Domain.Account.Model.V0_1;
 
     public class GradeSheetInfoApiModel
     {
@@ -85,10 +87,10 @@
         public string Profile { get; set; }
 
         [JsonPropertyName("pps")]
-        public IDictionary<string, Pps> Pps { get; set; }
+        public IDictionary<string, PpsApiModel> Pps { get; set; }
 
         [JsonPropertyName("students")]
-        public IDictionary<string, Students> Students { get; set; }
+        public IDictionary<string, StudentsApiModel> Students { get; set; }
 
         [JsonPropertyName("num_marks")]
         public string NumMarks { get; set; }
@@ -136,7 +138,7 @@
         public string Modified { get; set; }
     }
 
-    public class Pps
+    public class PpsApiModel
     {
 
         [JsonPropertyName("id")]
@@ -158,7 +160,7 @@
         public int Signed { get; set; }
     }
 
-    public class Students
+    public class StudentsApiModel
     {
         [JsonPropertyName("id")]
         public string Id { get; set; }
@@ -201,5 +203,56 @@
 
         [JsonPropertyName("casenum")]
         public string Casenum { get; set; }
+    }
+
+    static class GradeSheetInfoApiExt
+    {
+        public static GradeSheetInfo ToModel(this GradeSheetInfoApiModel apiModel)
+        {
+            return new GradeSheetInfo(
+                id: apiModel.Num,
+                guid: apiModel.Guid,
+                documentType: apiModel.DocType,
+                examType: apiModel.ExamType,
+                department: apiModel.Chair,
+                school: apiModel.Faculty,
+                examDate: apiModel.ExamDate,
+                examTime: apiModel.ExamTime,
+                closeDate: apiModel.CloseDate,
+                year: apiModel.Year,
+                course: apiModel.Course,
+                semester: apiModel.Semestr,
+                group: apiModel.Grp,
+                disciplineName: apiModel.DiscName,
+                educationForm: apiModel.EduForm,
+                direction: apiModel.Specnapr,
+                directionCode: apiModel.SpecnaprCode,
+                specialization: apiModel.Profile,
+                teachers: apiModel.Pps.Select(it => it.Value.ToModel()).ToList(),
+                students: apiModel.Students.Select(it => it.Value.ToModel()).ToList(),
+                @fixed: apiModel.Fixed != 0,
+                modifiedDate: apiModel.Modified
+            );
+        }
+
+        public static GradeSheetTeacher ToModel(this PpsApiModel apiModel)
+        {
+            return new GradeSheetTeacher(
+                uid: apiModel.Uid,
+                name: apiModel.Fio,
+                signed: apiModel.Signed != 0
+            );
+        }
+
+        public static GradeSheetStudent ToModel(this StudentsApiModel apiModel)
+        {
+            return new GradeSheetStudent(
+                name: apiModel.Fio,
+                mark: apiModel.Mark,
+                ticket: apiModel.Ticketnum,
+                recordBook: apiModel.Casenum,
+                blocked: apiModel.Blocked != 0
+            );
+        }
     }
 }

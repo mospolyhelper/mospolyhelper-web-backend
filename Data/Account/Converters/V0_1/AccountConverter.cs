@@ -421,6 +421,13 @@
             return new GradeSheets(semester, semesterList, sheetList);
         }
 
+        public GradeSheetInfo ParseGradeSheetInfo(string gradeSheetInfo)
+        {
+            this.logger.LogDebug("ParseGradeSheetInfo");
+            var info = JsonSerializer.Deserialize<GradeSheetInfoApiModel>(gradeSheetInfo);
+            return info.ToModel();
+        }
+
         public IList<GradeSheetMark> ParseGradeSheetMarks(string marks)
         {
             this.logger.LogDebug("ParseGradeSheetMarks");

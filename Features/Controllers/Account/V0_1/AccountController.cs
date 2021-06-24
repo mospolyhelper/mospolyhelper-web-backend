@@ -245,13 +245,40 @@
             return StatusCode(500);
         }
 
+        [HttpGet("grade-sheet")]
+        public async Task<ActionResult<GradeSheetInfo>> GetGradeSheetInfo(
+            [FromQuery] string guid = "",
+            [FromHeader] string? sessionId = ""
+        )
+        {
+            this.logger.LogInformation("GET request /account/grade-sheet");
+            if (string.IsNullOrEmpty(sessionId))
+            {
+                return Unauthorized();
+            }
+            var res = await useCase.GetGradeSheetInfo(sessionId, guid);
+            if (res.IsSuccess)
+            {
+                return Ok(res.GetOrNull());
+            }
+            else if (res.IsFailure)
+            {
+                return (res.ExceptionOrNull()) switch
+                {
+                    UnauthorizedAccessException e => Unauthorized(),
+                    _ => StatusCode(500),
+                };
+            }
+            return StatusCode(500);
+        }
+
         [HttpGet("grade-sheet-marks")]
         public async Task<ActionResult<IList<GradeSheetMark>>> GetGradeSheetMarks(
             [FromQuery] string guid = "",
             [FromHeader] string? sessionId = ""
         )
         {
-            this.logger.LogInformation("GET request /account/grade-sheets");
+            this.logger.LogInformation("GET request /account/grade-sheet-marks");
             if (string.IsNullOrEmpty(sessionId))
             {
                 return Unauthorized();
