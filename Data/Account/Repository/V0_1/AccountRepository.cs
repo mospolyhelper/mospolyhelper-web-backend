@@ -96,6 +96,12 @@
             return this.remoteDataSource.GetGradeSheets(sessionId, semester);
         }
 
+        public Task<Result<GradeSheetInfo>> GetGradeSheetInfo(string sessionId, string guid)
+        {
+            this.logger.LogDebug("GetGradeSheetInfo");
+            return this.remoteDataSource.GetGradeSheetInfo(sessionId, guid);
+        }
+
         public Task<Result<IList<GradeSheetMark>>> GetGradeSheetAllMarks(string sessionId, string guid)
         {
             this.logger.LogDebug("GetGradeSheetAllMarks");

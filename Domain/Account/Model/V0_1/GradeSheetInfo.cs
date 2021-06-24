@@ -5,7 +5,14 @@
 
     public class GradeSheetInfo
     {
-        public GradeSheetInfo(string id, string guid, string documentType, string examType, string department, string school, string examDate, string examTime, string closeDate, string year, string course, string semester, string @group, string disciplineName, string educationForm, string direction, string directionCode, string specialization, IDictionary<string, GradeSheetPps> pps, IDictionary<string, GradeSheetStudents> students, int @fixed, string modifiedDate)
+        public GradeSheetInfo(
+            string id, string guid, string documentType, string examType, 
+            string department, string school, string examDate, 
+            string examTime, string closeDate, string year, string course, 
+            string semester, string @group, string disciplineName, 
+            string educationForm, string direction, string directionCode, string specialization, 
+            IList<GradeSheetTeacher> teachers, IList<GradeSheetStudent> students,
+            bool @fixed, string modifiedDate)
         {
             Id = id;
             Guid = guid;
@@ -25,7 +32,7 @@
             Direction = direction;
             DirectionCode = directionCode;
             Specialization = specialization;
-            Pps = pps;
+            Teachers = teachers;
             Students = students;
             Fixed = @fixed;
             ModifiedDate = modifiedDate;
@@ -49,41 +56,41 @@
         public string Direction { get; set; }
         public string DirectionCode { get; set; }
         public string Specialization { get; set; }
-        public IDictionary<string, GradeSheetPps> Pps { get; set; }
-        public IDictionary<string, GradeSheetStudents> Students { get; set; }
-        public int Fixed { get; set; }
+        public IList<GradeSheetTeacher> Teachers { get; set; }
+        public IList<GradeSheetStudent> Students { get; set; }
+        public bool Fixed { get; set; }
         public string ModifiedDate { get; set; }
     }
 
-    public class GradeSheetPps
+    public class GradeSheetTeacher
     {
-        public GradeSheetPps(string uid, string fio, int signed)
+        public GradeSheetTeacher(string uid, string name, bool signed)
         {
             Uid = uid;
-            Fio = fio;
+            Name = name;
             Signed = signed;
         }
 
         public string Uid { get; set; }
-        public string Fio { get; set; }
-        public int Signed { get; set; }
+        public string Name { get; set; }
+        public bool Signed { get; set; }
     }
 
-    public class GradeSheetStudents
+    public class GradeSheetStudent
     {
-        public GradeSheetStudents(string name, string mark, string ticket, string recordBook, int canChange)
+        public GradeSheetStudent(string name, string mark, string ticket, string recordBook, bool blocked)
         {
             Name = name;
             Mark = mark;
             Ticket = ticket;
             RecordBook = recordBook;
-            CanChange = canChange;
+            Blocked = blocked;
         }
 
         public string Name { get; set; }
         public string Mark { get; set; }
         public string Ticket { get; set; }
         public string RecordBook { get; set; }
-        public int CanChange { get; set; }
+        public bool Blocked { get; set; }
     }
 }

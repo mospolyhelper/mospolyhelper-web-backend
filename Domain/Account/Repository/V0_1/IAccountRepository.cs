@@ -21,6 +21,8 @@
 
         public Task<Result<GradeSheets>> GetGradeSheets(string sessionId, string semester);
 
+        public Task<Result<GradeSheetInfo>> GetGradeSheetInfo(string sessionId, string guid);
+
         public Task<Result<IList<GradeSheetMark>>> GetGradeSheetAllMarks(string sessionId, string guid);
 
         public Task<Result<IList<Application>>> GetApplications(string sessionId);

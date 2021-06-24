@@ -173,7 +173,7 @@
             }
         }
 
-        public async Task<Result<GradeSheets>> GetGradeSheetInfo(string sessionId, string guid)
+        public async Task<Result<GradeSheetInfo>> GetGradeSheetInfo(string sessionId, string guid)
         {
             this.logger.LogDebug("GetGradeSheetInfo");
             try
@@ -182,17 +182,14 @@
                 var isAuthorized = CheckAuthorization(res);
                 if (!isAuthorized)
                 {
-                    return Result<GradeSheets>.Failure(new UnauthorizedAccessException());
+                    return Result<GradeSheetInfo>.Failure(new UnauthorizedAccessException());
                 }
-                return Result<GradeSheets>.Success(
-                    converter.ParseGradeSheets(res) ??
-                    new GradeSheets("Нет", Array.Empty<string>(), Array.Empty<GradeSheet>())
-                );
+                return Result<GradeSheetInfo>.Success(converter.ParseGradeSheetInfo(res));
             }
             catch (Exception e)
             {
-                this.logger.LogError(e, "GetGradeSheets");
-                return Result<GradeSheets>.Failure(e);
+                this.logger.LogError(e, "GetGradeSheetInfo");
+                return Result<GradeSheetInfo>.Failure(e);
             }
         }
 
