@@ -32,24 +32,24 @@
     public class AccountClient
     {
         private const string UrlBase = "https://e.mospolytech.ru";
-        private const string UrlAuth = UrlBase + "/?p=login";
-        private const string UrlInfo = UrlBase + "/?";
-        private const string UrlProfile = UrlBase + "/?p=about";
-        private const string UrlNotifications = UrlBase + "/?p=alerts";
-        private const string UrlMessages = UrlBase + "/?p=messages";
-        private const string UrlPayments = UrlBase + "/?p=payments";
-        private const string UrlSchedules = UrlBase + "/?p=rasp";
-        private const string UrlMarks = UrlBase + "/?p=marks";
-        private const string UrlGradeSheets = UrlBase + "/?p=stud_stats";
-        private const string UrlGradeSheetInfo = UrlBase + "/stats_api.php";
-        private const string UrlGradeSheetMarks = UrlBase + "/stats_api.php";
-        private const string UrlProjects = UrlBase + "/?p=projects";
-        private const string UrlPhysed = UrlBase + "/?p=phys";
-        private const string UrlClassmates = UrlBase + "/?p=group";
-        private const string UrlTeachers = UrlBase + "/?p=teachers";
-        private const string UrlApplications = UrlBase + "/?p=sprav";
-        private const string UrlMyPortfolio = UrlBase + "/?p=myportfolio";
-        private const string UrlPortfolio = UrlBase + "/?p=portfolio";
+        private const string UrlAuth = UrlBase + "/old?p=login";
+        private const string UrlInfo = UrlBase + "/old?";
+        private const string UrlProfile = UrlBase + "/old?p=about";
+        private const string UrlNotifications = UrlBase + "/old?=alerts";
+        private const string UrlMessages = UrlBase + "/old?p=messages";
+        private const string UrlPayments = UrlBase + "/old?p=payments";
+        private const string UrlSchedules = UrlBase + "/old?p=rasp";
+        private const string UrlMarks = UrlBase + "/old?p=marks";
+        private const string UrlGradeSheets = UrlBase + "/old?p=stud_stats";
+        private const string UrlGradeSheetInfo = UrlBase + "/old/stats_api.php";
+        private const string UrlGradeSheetMarks = UrlBase + "/old/stats_api.php";
+        private const string UrlProjects = UrlBase + "/old?p=projects";
+        private const string UrlPhysed = UrlBase + "/old?p=phys";
+        private const string UrlClassmates = UrlBase + "/old?p=group";
+        private const string UrlTeachers = UrlBase + "/old?p=teachers";
+        private const string UrlApplications = UrlBase + "/old?p=sprav";
+        private const string UrlMyPortfolio = UrlBase + "/old?p=myportfolio";
+        private const string UrlPortfolio = UrlBase + "/old?p=portfolio";
 
         private readonly HttpClient client;
         private readonly ILogger logger;
